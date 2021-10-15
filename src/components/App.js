@@ -249,7 +249,8 @@ class App extends Component {
         .on("confirmation", () => {
           localStorage.setItem(this.state.accountAddress, new Date().getTime());
           this.setState({ loading: false });
-          window.location.reload();
+          window.location.hash = "#/my-tokens"; // Move them to their token page after minting
+		  window.location.reload(); // Sometimes it doesn't have the most up to date info so just refresh to fix it.
         });
     } else {
       if (nameIsUsed) {
