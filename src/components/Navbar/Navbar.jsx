@@ -8,7 +8,7 @@ const Navbar = () => {
       <div className="container">
         <img src={icon} alt="" />
         <Link to="/" className="navbar-brand ml-2">
-          CryptoPaws NFT's
+          CryptoPaw NFTs
         </Link>
         <button
           className="navbar-toggler"

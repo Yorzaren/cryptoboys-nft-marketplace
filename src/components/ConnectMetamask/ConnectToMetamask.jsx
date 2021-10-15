@@ -5,11 +5,11 @@ const ConnectToMetamask = ({ connectToMetamask }) => {
   return (
     <div className="jumbotron">
       <h1 className="display-5">
-        CryptoPaws NFT Marketplace
+        CryptoPaw NFT Marketplace
       </h1>
       <p className="lead">
         This is an NFT marketplace where you can mint your ERC721 implemented{" "}
-        <i>CryptoPaws NFTs</i> and manage them.
+        <i>CryptoPaw NFTs</i> and manage them.
       </p>
       <hr className="my-4" />
       <button
