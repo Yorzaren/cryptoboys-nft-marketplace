@@ -7,21 +7,21 @@ class FormAndPreview extends Component {
     this.state = {
       userSelectedColors: [
         {
-          cardBorderColor: "",
-          cardBackgroundColor: "",
-          headBorderColor: "",
-          headBackgroundColor: "",
-          leftEyeBorderColor: "",
-          rightEyeBorderColor: "",
-          leftEyeBackgroundColor: "",
-          rightEyeBackgroundColor: "",
-          leftPupilBackgroundColor: "",
-          rightPupilBackgroundColor: "",
-          mouthColor: "",
-          neckBackgroundColor: "",
-          neckBorderColor: "",
-          bodyBackgroundColor: "",
-          bodyBorderColor: "",
+          cardBorderColor: this.getRandomColor(),
+          cardBackgroundColor: this.getRandomColor(),
+          headBorderColor: this.getRandomColor(),
+          headBackgroundColor: this.getRandomColor(),
+          leftEyeBorderColor: this.getRandomColor(),
+          rightEyeBorderColor: this.getRandomColor(),
+          leftEyeBackgroundColor: this.getRandomColor(),
+          rightEyeBackgroundColor: this.getRandomColor(),
+          leftPupilBackgroundColor: this.getRandomColor(),
+          rightPupilBackgroundColor: this.getRandomColor(),
+          mouthColor: this.getRandomColor(),
+          neckBackgroundColor: this.getRandomColor(),
+          neckBorderColor: this.getRandomColor(),
+          bodyBackgroundColor: this.getRandomColor(),
+          bodyBorderColor: this.getRandomColor(),
         },
       ],
       cryptoBoyName: "",
@@ -41,7 +41,9 @@ class FormAndPreview extends Component {
       this.state.cryptoBoyPrice
     );
   };
-
+  getRandomColor = () => {
+	  return "#"+Math.floor(Math.random()*16777215).toString(16);
+  };
   render() {
     return (
       <div>
