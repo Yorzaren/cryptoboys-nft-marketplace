@@ -56,7 +56,7 @@ class App extends Component {
         lastMintTime: localStorage.getItem(this.state.accountAddress),
       });
       this.state.lastMintTime === undefined || this.state.lastMintTime === null
-        ? (mintBtn.innerHTML = "Mint My Crypto Boy")
+        ? (mintBtn.innerHTML = "Mint My CryptoPaw")
         : this.checkIfCanMint(parseInt(this.state.lastMintTime));
     }
   };
@@ -70,7 +70,7 @@ class App extends Component {
       const diff = countDownTime - now;
       if (diff < 0) {
         mintBtn.removeAttribute("disabled");
-        mintBtn.innerHTML = "Mint My Crypto Boy";
+        mintBtn.innerHTML = "Mint My CryptoPaw";
         localStorage.removeItem(this.state.accountAddress);
         clearInterval(interval);
       } else {
@@ -251,7 +251,8 @@ class App extends Component {
         .on("confirmation", () => {
           localStorage.setItem(this.state.accountAddress, new Date().getTime());
           this.setState({ loading: false });
-          window.location.reload();
+          window.location.hash = "#/my-tokens"; // Move them to their token page after minting
+		  window.location.reload(); // Sometimes it doesn't have the most up to date info so just refresh to fix it.
         });
     } else {
       if (nameIsUsed) {
