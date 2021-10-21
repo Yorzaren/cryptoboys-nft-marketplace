@@ -1,0 +1,8 @@
+Peter Ly
+10-20-2021
+
+Invididual Branch Contribution:
+As of right now, I have not made any code changes to the project, however I am actively reviewing and studying their parts
+of code while I wait for their approval before I get started on changing the UI to best fit our project. 
+Some team members and I will meet in-person on Friday to focus mainly on changing the UI as well as other parts that need
+to be done.
