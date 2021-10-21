@@ -1,0 +1,5 @@
+https://docs.ipfs.io/concepts/what-is-ipfs/#content-addressing
+https://docs.ipfs.io/concepts/how-ipfs-works/#content-addressing
+https://docs.ipfs.io/concepts/how-ipfs-works/#distributed-hash-tables-dhts
+
+
