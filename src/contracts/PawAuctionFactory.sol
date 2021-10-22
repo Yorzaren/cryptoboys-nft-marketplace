@@ -2,7 +2,7 @@
 // Destiny Graham and Tyler Landau will be collaborating on this contract with additional tutelage
 // from James Tackett and Faith Nice
 
-pragma solidity ^0.4.8;
+pragma solidity >=0.8.0;
 
 import { Auction } from './Auction.sol';
 
