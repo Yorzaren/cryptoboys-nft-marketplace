@@ -204,9 +204,6 @@ class App extends Component {
         digitFourBorder,
         digitcarpalPadColor,
         digitcarpalPadBorder,
-        neckBorderColor,
-        bodyBackgroundColor,
-        bodyBorderColor,
       } = colors;
       let previousTokenId;
       previousTokenId = await this.state.cryptoBoysContract.methods
@@ -234,9 +231,6 @@ class App extends Component {
             digitFourBorder,
             digitcarpalPadColor,
             digitcarpalPadBorder,
-            neckBorderColor,
-            bodyBackgroundColor,
-            bodyBorderColor,
           },
         },
       };
