@@ -46,7 +46,7 @@ class FormAndPreview extends Component {
       <div>
         <div className="card mt-1">
           <div className="card-body align-items-center d-flex justify-content-center">
-            <h5>Color Your CryptoPaw As You Want It To be!</h5>
+            <h5>Make your own CryptoPaw!</h5>
           </div>
         </div>
         <form onSubmit={this.callMintMyNFTFromApp} className="pt-4 mt-1">
