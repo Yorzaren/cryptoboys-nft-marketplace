@@ -27,9 +27,6 @@ const CryptoBoyNFTImage = ({ colors }) => {
     digitFourBorder,
     digitcarpalPadColor,
     digitcarpalPadBorder,
-    neckBorderColor,
-    bodyBackgroundColor,
-    bodyBorderColor,
   } = colors;
 
   // Keep
