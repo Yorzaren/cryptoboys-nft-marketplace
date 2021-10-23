@@ -28,7 +28,7 @@ const AllCryptoBoys = ({
       <div className="card mt-1">
         <div className="card-body align-items-center d-flex justify-content-center">
           <h5>
-            Total No. of CryptoBoy's Minted On The Platform :{" "}
+            Total No. of CryptoPaws Minted On The Platform :{" "}
             {totalTokensMinted}
           </h5>
         </div>
