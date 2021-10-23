@@ -30,7 +30,7 @@ const MyCryptoBoys = ({
       <div className="card mt-1">
         <div className="card-body align-items-center d-flex justify-content-center">
           <h5>
-            Total No. of CryptoBoy's You Own : {totalTokensOwnedByAccount}
+            Total No. of CryptoPaws You Own : {totalTokensOwnedByAccount}
           </h5>
         </div>
       </div>
