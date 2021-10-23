@@ -1,7 +1,11 @@
-const CryptoPaws = artifacts.require("CryptoPaws");
+const CryptoPaws = artifacts.require("./CryptoPaws");
+var PawAuctionFactory = artifacts.require("./PawAuctionFactory.sol");
+var PawAuction = artifacts.require("./PawAuction.sol")
 
 module.exports = async function(deployer) {
   await deployer.deploy(CryptoPaws);
+  await deployer.deploy(PawAuctionFactory);
+  await deployer.deploY(PawAuction);
 };
 
 
