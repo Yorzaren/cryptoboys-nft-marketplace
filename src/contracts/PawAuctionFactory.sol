@@ -3,10 +3,11 @@
 // from James Tackett and Faith Nice
 
 pragma solidity >=0.8.0;
+pragma abicoder v2;
 
-import { Auction } from './Auction.sol';
+import { PawAuction } from './PawAuction.sol';
 
-contract AuctionFactory {
+contract PawAuctionFactory {
     address[] public auctions;
 
     event AuctionCreated(address auctionContract, address owner, uint numAuctions, address[] allAuctions);

@@ -1,5 +1,4 @@
-const Migrations = artifacts.require("Migrations"); // Noticed in GitHub that this is listed as ./Migrations.sol
-                                                    // Is this no longer necessary?
+const Migrations = artifacts.require("./Migrations.sol"); 
 
 module.exports = function(deployer) {
   deployer.deploy(Migrations);

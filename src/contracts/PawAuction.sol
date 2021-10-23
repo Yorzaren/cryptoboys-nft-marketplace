@@ -2,7 +2,8 @@
 // Destiny Graham and Tyler Landau will be collaborating on this contract with additional tutelage
 // from James Tackett and Faith Nice
 
-pragma solidity ^0.4.8;
+pragma solidity >=0.8.0;
+pragma abicoder v2;
 
 contract Auction {
     // static
@@ -36,6 +37,7 @@ contract Auction {
     }
 
     function getHighestBid()
+        private
         constant
         returns (uint)
     {
