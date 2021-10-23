@@ -4,7 +4,7 @@
 
 pragma solidity >=0.8.0;
 
-import { Auction } from './Auction.sol';
+import { PawAuction } from './PawAuction.sol';
 
 contract AuctionFactory {
     address[] public auctions;
