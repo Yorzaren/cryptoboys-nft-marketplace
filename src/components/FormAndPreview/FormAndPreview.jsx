@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import CryptoBoyNFTImage from "../CryptoBoyNFTImage/CryptoBoyNFTImage";
+import CryptoPawNFTImagePreview from "../CryptoPawNFTImagePreview/CryptoPawNFTImagePreview";
 
 const ipfsClient = require("ipfs-http-client");
 const ipfs = ipfsClient({
@@ -29,8 +29,8 @@ class FormAndPreview extends Component {
           digitcarpalPadBorder: this.getRandomColor(),
         },
       ],
-      cryptoBoyName: "",
-      cryptoBoyPrice: "",
+      cryptoPawName: "",
+      cryptoPawPrice: "",
     };
   }
 
@@ -40,12 +40,14 @@ class FormAndPreview extends Component {
 
   callMintMyNFTFromApp = async (e) => {
     e.preventDefault();
-    const cid = await ipfs.add(this.svgelement.current);
+    var s = new XMLSerializer();
+    let svg = s.serializeToString(this.svgelement.current);
+    const cid = await ipfs.add(svg);
     let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;
     this.props.mintMyNFT(
       this.state.userSelectedColors[0],
-      this.state.cryptoBoyName,
-      this.state.cryptoBoyPrice,
+      this.state.cryptoPawName,
+      this.state.cryptoPawPrice,
       uri
     );
   };
@@ -251,7 +253,7 @@ class FormAndPreview extends Component {
               </div>
             </div>
             <div className="col-md-6 d-flex justify-content-center align-items-center">
-              <CryptoBoyNFTImage colors={this.state.userSelectedColors[0]} svgref={this.svgelement} />
+              <CryptoPawNFTImagePreview colors={this.state.userSelectedColors[0]} svgref={this.svgelement} />
             </div>
           </div>
           <div className="row">
@@ -355,15 +357,15 @@ class FormAndPreview extends Component {
             </div>
             <div className="col-md-6">
               <div className="form-group">
-                <label htmlFor="cryptoBoyName">Name</label>
+                <label htmlFor="cryptoPawName">Name</label>
                 <input
                   required
                   type="text"
-                  value={this.state.cryptoBoyName}
+                  value={this.state.cryptoPawName}
                   className="form-control"
                   placeholder="Enter Your CryptoPaw's Name"
                   onChange={(e) =>
-                    this.setState({ cryptoBoyName: e.target.value })
+                    this.setState({ cryptoPawName: e.target.value })
                   }
                 />
               </div>
@@ -373,12 +375,12 @@ class FormAndPreview extends Component {
                   required
                   type="number"
                   name="price"
-                  id="cryptoBoyPrice"
-                  value={this.state.cryptoBoyPrice}
+                  id="cryptoPawPrice"
+                  value={this.state.cryptoPawPrice}
                   className="form-control"
                   placeholder="Enter Price In Ξ"
                   onChange={(e) =>
-                    this.setState({ cryptoBoyPrice: e.target.value })
+                    this.setState({ cryptoPawPrice: e.target.value })
                   }
                 />
               </div>

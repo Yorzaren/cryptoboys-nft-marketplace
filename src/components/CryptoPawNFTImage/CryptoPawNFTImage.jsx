@@ -7,7 +7,9 @@ class CryptoPawNFTImage extends Component {
 
     render() {
         return (
-            <img src={this.props.cryptoPaw.tokenURI}/>
+            <div>
+                <img src={this.props.cryptoPaw.tokenURI}/>
+            </div>
         )
     }
 }

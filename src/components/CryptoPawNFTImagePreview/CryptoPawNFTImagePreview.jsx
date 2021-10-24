@@ -1,5 +1,5 @@
 import React from "react";
-function CryptoBoyNFTImage(props) {
+function CryptoPawNFTImagePreview(props) {
 
   const {
     cardBorderColor,
@@ -63,4 +63,4 @@ function CryptoBoyNFTImage(props) {
   );
 };
 
-export default CryptoBoyNFTImage;
+export default CryptoPawNFTImagePreview;

@@ -14,13 +14,6 @@ import Navbar from "./Navbar/Navbar";
 import MyCryptoPaws from "./MyCryptoPaws/MyCryptoPaws";
 import Queries from "./Queries/Queries";
 
-const ipfsClient = require("ipfs-http-client");
-const ipfs = ipfsClient({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-});
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -45,7 +38,6 @@ class App extends Component {
   componentWillMount = async () => {
     await this.loadWeb3();
     await this.loadBlockchainData();
-    await this.setMetaData();
     await this.setMintBtnTimer();
   };
 
@@ -169,10 +161,9 @@ class App extends Component {
 
       const price = window.web3.utils.toWei(tokenPrice.toString(), "Ether");
       let mintPrice;
-      mintPrice = await this.state.cryptoBoysContract.methods.mintPrice.call();
-      
+      mintPrice = await this.state.cryptoPawsContract.methods.mintPrice.call();
       this.state.cryptoPawsContract.methods
-        .mintPaw(name, colorsUsed, price, uri)
+        .mintPaw(name, colorString, price, uri)
         .send({ from: this.state.accountAddress, value: mintPrice })
         .on("confirmation", () => {
           localStorage.setItem(this.state.accountAddress, new Date().getTime());
@@ -270,7 +261,7 @@ class App extends Component {
                     totalTokensMinted={this.state.totalTokensMinted}
                     changeTokenPrice={this.changeTokenPrice}
                     toggleForSale={this.toggleForSale}
-                    buyCryptoBoy={this.buyCryptoBoy}
+                    buyCryptoPaw={this.buyCryptoPaw}
                   />
                 )}
               />
@@ -279,7 +270,7 @@ class App extends Component {
                 render={() => (
                   <MyCryptoPaws
                     accountAddress={this.state.accountAddress}
-                    cryptoBoys={this.state.cryptoPaws}
+                    cryptoPaws={this.state.cryptoPaws}
                     totalTokensOwnedByAccount={
                       this.state.totalTokensOwnedByAccount
                     }

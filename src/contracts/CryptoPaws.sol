@@ -14,7 +14,7 @@ contract CryptoPaws is ERC721 {
     uint256 public pawCounter;
 
     //set a default mint price
-    uint256 public mintPrice = 2000000 gwei;
+    uint256 public mintPrice = 4000000000000000 wei;
 
     // define paw struct
     struct CryptoPaw {
