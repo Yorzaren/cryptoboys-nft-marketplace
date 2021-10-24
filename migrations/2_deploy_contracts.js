@@ -16,10 +16,10 @@ module.exports = async function(deployer) {
 // var AuctionFactory = artifacts.require("./PawAuctionFactory.sol");
 // var Auction = artifacts.require("./PawAuction.sol");
 
-module.exports = function(deployer) {
+//module.exports = function(deployer) {
   // deployer.deploy(ConvertLib);
   // deployer.autolink();
   // deployer.deploy(MetaCoin);
-  deployer.deploy(AuctionFactory);
+  //deployer.deploy(AuctionFactory);
   // deployer.deploy(Auction);
-};
+//};

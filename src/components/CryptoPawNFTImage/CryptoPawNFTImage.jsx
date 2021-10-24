@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component} from "react";
 
 class CryptoPawNFTImage extends Component {
     constructor(props) {
@@ -7,7 +7,11 @@ class CryptoPawNFTImage extends Component {
 
     render() {
         return (
-            <img src={this.props.cryptoPaw.tokenURI}/>
+            <div>
+                <img src={this.props.cryptoPaw.tokenURI}/>
+            </div>
         )
     }
 }
+
+export default CryptoPawNFTImage;

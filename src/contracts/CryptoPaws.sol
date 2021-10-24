@@ -13,15 +13,15 @@ contract CryptoPaws is ERC721 {
     // total number of paws
     uint256 public pawCounter;
 
-    //set a default price for freshly minted paws
-    uint256 public defaultPrice = 20000000 gwei;
     //set a default mint price
-    uint256 public mintPrice = 20000000 gwei;
+    uint256 public mintPrice = 4000000000000000 wei;
 
     // define paw struct
     struct CryptoPaw {
         //unique tokenid
         uint256 tokenId;
+
+        string tokenName;
         //string that specifies unique color combination
         string creationStr;
         //string that holds URI that points to image file on ipfs
@@ -39,6 +39,8 @@ contract CryptoPaws is ERC721 {
 
     // map tokenId to a Paw
     mapping(uint256 => CryptoPaw) public allPaws;
+
+    mapping(string => bool) public nameExists;
     // check if a selector number already exists
     mapping(string => bool) public creationStrs;
     // check if a URI exists
@@ -51,7 +53,7 @@ contract CryptoPaws is ERC721 {
     }
 
     // minting function for new PAW
-    function mintPaw(string memory _creationStr, string memory _tokenURI) external payable{
+    function mintPaw(string memory _name, string memory _creationStr, uint _price, string memory _tokenURI) external payable{
         //make sure address exists and isnt a 0 address
         require(msg.sender != address(0), "Non-zero addresses only");
         //make sure the mint price is paid
@@ -76,11 +78,12 @@ contract CryptoPaws is ERC721 {
         
         CryptoPaw memory newCryptoPaw = CryptoPaw(
             pawCounter,
+            _name,
             _creationStr,
             _tokenURI,
             payable(msg.sender),
             payable(msg.sender),
-            defaultPrice,
+            _price,
             0,
             false);
 
