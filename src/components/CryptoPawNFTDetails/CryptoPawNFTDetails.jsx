@@ -25,7 +25,7 @@ class CryptoPawNFTDetails extends Component {
                 </p>
                 <p>
                     <span className="font-weight-bold">Owned By</span> :{" "}
-                    {this.props.cryptoPaw.ownedBy.substr(0, 5) + "..." + this.props.cryptoPaw.ownedBy.slice(this.props.cryptoPaw.ownedBy.length - 5)}
+                    {this.props.cryptoPaw.currentOwner.substr(0, 5) + "..." + this.props.cryptoPaw.currentOwner.slice(this.props.cryptoPaw.currentOwner.length - 5)}
                 </p>
                 <p>
                     <span className="font-weight-bold">Price</span> :{" "}
@@ -33,7 +33,7 @@ class CryptoPawNFTDetails extends Component {
                 </p>
                 <p>
                     <span className="font-weight-bold">No. of Transfers</span> :{" "}
-                    {this.props.cryptoPaw.numberOfTransfers.toNumber()}
+                    {this.props.cryptoPaw.timesTransferred.toNumber()}
                 </p>
                 <div>
                     {this.props.accountAddress === this.props.cryptoPaw.currentOwner ? (
@@ -82,7 +82,7 @@ class CryptoPawNFTDetails extends Component {
                                 className="btn btn-outline-danger mt-4 w-50"
                                 style={{ fontsize: "0.8rem", letterSpacing: "0.14rem"}}
                                 onClick={() =>
-                                    this.props.toggleForsale(
+                                    this.props.toggleForSale(
                                         this.props.cryptoPaw.tokenId.toNumber()
                                     )
                                 }
@@ -94,12 +94,12 @@ class CryptoPawNFTDetails extends Component {
                                 className="btn btn-outline-success mt-4 w-50"
                                 style={{ fontsize: "0.8rem", letterSpacing: "0.14rem"}}
                                 onClick={() =>
-                                    this.props.toggleForsale(
+                                    this.props.toggleForSale(
                                         this.props.cryptoPaw.tokenId.toNumber()
                                     )
                                 }
                             >
-                                All sale
+                                Make For Sale
                             </button>
                         )
                     ) : null}
