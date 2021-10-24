@@ -22,7 +22,7 @@ contract PawAuctionFactory {
         AuctionCreated(newAuction, msg.sender, auctions.length, auctions);
     }
 
-    function allAuctions() constant returns (address[]) {
+    function allAuctions() returns (address[]) {
         return auctions;
     }
 }
