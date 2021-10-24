@@ -38,7 +38,7 @@ class FormAndPreview extends Component {
     await this.props.setMintBtnTimer();
   };
 
-  callMintMyNFTFromApp = (e) => {
+  callMintMyNFTFromApp = async (e) => {
     e.preventDefault();
     const cid = await ipfs.add(this.svgelement.current);
     let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;

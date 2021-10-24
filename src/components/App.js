@@ -5,7 +5,7 @@ import Web3 from "web3";
 import CryptoPaws from "../abis/CryptoPaws.json";
 
 import FormAndPreview from "../components/FormAndPreview/FormAndPreview";
-import AllCryptoPaws from "./AllCryptoBoys/AllCryptoPaws";
+import AllCryptoPaws from "./AllCryptoPaws/AllCryptoPaws";
 import AccountDetails from "./AccountDetails/AccountDetails";
 import ContractNotDeployed from "./ContractNotDeployed/ContractNotDeployed";
 import ConnectToMetamask from "./ConnectMetamask/ConnectToMetamask";
