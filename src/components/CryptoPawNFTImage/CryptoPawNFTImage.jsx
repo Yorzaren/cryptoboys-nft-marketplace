@@ -11,3 +11,5 @@ class CryptoPawNFTImage extends Component {
         )
     }
 }
+
+export default CryptoPawNFTImage;

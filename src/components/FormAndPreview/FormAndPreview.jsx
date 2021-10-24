@@ -1,9 +1,17 @@
 import React, { Component } from "react";
 import CryptoBoyNFTImage from "../CryptoBoyNFTImage/CryptoBoyNFTImage";
 
+const ipfsClient = require("ipfs-http-client");
+const ipfs = ipfsClient({
+  host: "ipfs.infura.io",
+  port: 5001,
+  protocol: "https",
+});
+
 class FormAndPreview extends Component {
   constructor(props) {
     super(props);
+    this.svgelement = React.createRef();
     this.state = {
       userSelectedColors: [
         {
@@ -32,10 +40,13 @@ class FormAndPreview extends Component {
 
   callMintMyNFTFromApp = (e) => {
     e.preventDefault();
+    const cid = await ipfs.add(this.svgelement.current);
+    let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;
     this.props.mintMyNFT(
       this.state.userSelectedColors[0],
       this.state.cryptoBoyName,
-      this.state.cryptoBoyPrice
+      this.state.cryptoBoyPrice,
+      uri
     );
   };
   getRandomColor = () => {
@@ -240,7 +251,7 @@ class FormAndPreview extends Component {
               </div>
             </div>
             <div className="col-md-6 d-flex justify-content-center align-items-center">
-              <CryptoBoyNFTImage colors={this.state.userSelectedColors[0]} />
+              <CryptoBoyNFTImage colors={this.state.userSelectedColors[0]} svgref={this.svgelement} />
             </div>
           </div>
           <div className="row">
