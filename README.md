@@ -9,8 +9,10 @@ I highly recommend installing and using ganache-cli
 ### Hardcode the Mnemonic
 Perm set the mnemonic so you dont have to reset your metamask. (The example mnemonic would be not secure; don't use it on a public blockchain)
 ```
-ganache-cli --port 7545 --mnemonic "thought lion icon outdoor human west tongue brief grape glory network earth"
+ganache-cli --port 7545 --mnemonic <INSERT mnemonic in Quotes>
 ```
+Note: If hard code it might might run into nouce errors, you have a nounce error with MetaMask its because you need to go into MetaMask and reset the account. See: https://medium.com/singapore-blockchain-dapps/reset-metamask-nonce-766dd4c27ca8
+
 ### Compile, Migrate and Start the DApp
 Open another terminal and use it to compile and migrate the contracts and then start the DApp
 ```
