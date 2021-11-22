@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
+    <nav className="navbar navbar-fullwidth -md navbar-dark bg-dark">
+      <div className="container-fullwidth">
         <img src={icon} alt="" />
         <Link to="/" className="navbar-brand ml-2">
           CryptoPaw NFTs
@@ -48,12 +48,12 @@ const Navbar = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/Auction" className="nav-link">
+              <Link to="/auction" className="nav-link">
                 Auction
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/Auction" className="nav-link">
+              <Link to="/lottery" className="nav-link">
                 Lottery
             </Link>
            </li>

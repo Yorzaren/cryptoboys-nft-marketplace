@@ -13,6 +13,7 @@ import Loading from "./Loading/Loading";
 import Navbar from "./Navbar/Navbar";
 import MyCryptoPaws from "./MyCryptoPaws/MyCryptoPaws";
 import Queries from "./Queries/Queries";
+import Auction from "./Auction/Auction";
 
 class App extends Component {
   constructor(props) {
@@ -281,6 +282,12 @@ class App extends Component {
                 path="/queries"
                 render={() => (
                   <Queries cryptoPawsContract={this.state.cryptoPawsContract} />
+                )}
+              />
+              <Route
+                path="/auction"
+                render={() => (
+                  <Auction />
                 )}
               />
             </HashRouter>
