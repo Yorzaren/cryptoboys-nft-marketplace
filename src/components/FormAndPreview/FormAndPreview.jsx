@@ -44,6 +44,7 @@ class FormAndPreview extends Component {
     let svg = s.serializeToString(this.svgelement.current);
     const cid = await ipfs.add(svg);
     let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;
+	console.log(uri);
     this.props.mintMyNFT(
       this.state.userSelectedColors[0],
       this.state.cryptoPawName,
@@ -55,34 +56,12 @@ class FormAndPreview extends Component {
   callMassMintFromApp = async (e) => {
 	e.preventDefault();
 	// These match the bulkMint() in CyptoPaws.sol
-	var arrayOfBulkColors = ["#daa520#76276c#b1af1c#ebfd00#1c4de#530ee1#398142#d75777#f51a19#cf4a9#a89851#12aefc", "#daa520#be530f#ffca1f#bb4a2#b0fa8#9cc016#1bca0#ff91ee#e81f31#8786c3#9b91ef#d0c9ac", "#daa520#2de31b#4ae7e#e923d1#7248b7#c130e0#5a977e#cc5f82#8b1aee#5397fd#dc6c06#5e5c5f", "#daa520#d28220#f7aef7#eccdf9#16dd8c#fc164e#60ba6c#6458d7#62e85e#8e9b85#d25ed4#391d2a", "#daa520#b93cd7#278f81#9bfea7#557f55#a25f96#3e274e#4d374#72d658#4f98bf#4e52c7#f203cc", "#daa520#ba4a87#ef1b7d#8fd4a0#6d506b#7e5895#fb9ca9#4624da#164f40#59fb23#12afe4#91288b", "#daa520#52a501#d56ea6#171951#a7978f#6d9da2#e4a28d#b3ec02#85f2ca#2ebad0#89b414#720d06", "#daa520#2ec4dc#852557#ddd64d#5c386f#994c0c#94ba64#745d73#292280#cfb5d9#287402#3afc46", "#daa520#5a0638#9f3780#c09d36#87def7#460e9f#6c1ae2#feff04#fa921b#7807de#33cfa6#24bec3", "#daa520#aa5d70#37bffe#3058fa#cece03#ed492a#ea4628#f63d5d#8618a8#93a510#a96078#f2f2e0", "#daa520#feddcc#65b28f#1b18bc#121d54#a5f50f#b2ddb#b7c0b6#97d59e#67956f#3d99f5#cc5981", "#daa520#970b08#b585e9#960696#5f4cd#a4bf56#e36c07#9cecd9#9e1d4c#6afecf#62edc2#f87384", "#daa520#420c35#26f503#b58a1a#7b0a67#ee15a3#ac0bf8#fcf5b1#e73962#7471d#969a4e#9a71ca", "#daa520#8a2b9d#f98acb#6bf37f#3f7e9e#6ca6fa#ea23ad#36c1ef#278fb9#a5d218#35de18#1110a6", "#daa520#cbf4cb#f706f7#d421b0#4f028d#cbc6#da6138#538c3#7236cc#99f779#aa8af6#dec561", "#daa520#96f58a#1cf17a#f830c7#8daa7c#1d4987#70990#3597d3#6ef3be#21daf9#6516ca#f1de17", "#daa520#9980ca#a6d5b1#b62dac#38e952#3092e4#6c223f#c3a910#779852#cb697a#914712#1cb470", "#daa520#111f7e#7a8292#2003fe#d5239#a8545a#b10d75#e04d9e#67dffc#ef627#d1f31a#dafb3b", "#daa520#ace3#aa9bb5#3672d8#c74f95#cbff69#6350ae#b4346f#c1e828#30cead#99ae8c#65ee53", "#daa520#7c6500#d8b310#ebb65e#a21ad9#ff968c#635f74#b226b6#af0800#bc0eee#c2c4ce#71be1f"];
+	var arrayOfBulkColors = ["#daa520#7e3909#fa8813#3b2d3c#8dfcc7#caf4b2#245985#16b5cf#8bb47f#396fbf#a1c33d#94d39a", "#daa520#776ff5#bfda1b#315230#a06326#63fe#eaba1c#ed4405#cbda48#36ec36#edc6e4#361200", "#daa520#ade1e#bfbf45#9e2081#25c3b8#960997#22fe10#7e10dc#e40830#40d018#b11f8#65d0f8", "#daa520#541891#89cb51#6c21a4#cc5c0a#8de62#6e2b69#850329#5d018e#df88b0#e27eef#154600", "#daa520#63b1ef#e07133#1bcd46#9407e0#bb48cb#d7a178#205b34#8f1d56#206661#37d736#720725", "#daa520#f28cda#f886a4#000000#fdde42#2c9cf2#f95618#8ac1d4#b47aa3#105854#121d6a#d7bf5", "#daa520#1b4d46#40cff0#825fe2#f6e753#ad10eb#fb7cfd#59ac62#499fe1#165ac8#91a0fa#cf118f", "#daa520#9b56#8992e7#9f0004#6a8359#185587#ed943a#497a31#797527#f81e1b#612044#fe9e36", "#daa520#13a124#a62908#b5c7b2#2188a2#e508a7#79d59c#2d903e#ecc430#78847e#d09275#3157ef", "#daa520#b96b64#396c90#04c45a#fc4668#5afc5f#65e9f9#41df38#b7ac8d#5d3121#aceca4#536c4c", "#daa520#d26722#b67abe#925b27#777ade#49a122#5e885c#af9994#1e28ca#e186eb#a9396b#c66ef1", "#daa520#84aa02#9391fc#9fcdcf#8b1e42#bc4588#49451c#93cb#8ac55e#d1f58b#ef73b9#7c8491", "#daa520#56ba94#f367e3#1eac92#1ad7b0#1b9e86#f06df7#dae34e#eb1521#251815#6426b7#3f304f", "#daa520#9204a0#c4bd1d#89feb4#9e3444#d81158#4cd76d#5f385d#4ccfb9#97da21#3b93c9#bb6f5e", "#daa520#5a0371#000000#e5bcad#429689#4c110b#e9cada#30ec52#f0dc5#3c982b#da38b1#d206a1", "#daa520#21fbbb#c86f0b#828147#be7406#30c0a2#ec01a#71f6e3#a847bd#7b32d6#aa3783#cb949c", "#daa520#92e5#110c98#88e341#39f511#1a275b#175cd4#4aa403#7f489c#5a3c10#4b296d#bf0292", "#daa520#c422bb#ab41c6#15fb5b#fdcbda#ea11a8#e07e28#9fb5ad#54d63c#d47d6e#d2f72#a2b96a", "#daa520#669b7b#10cec0#cd019a#36df4c#85ef43#ddcc4e#3b76f0#3d7d90#8fe803#dd981b#26d70c", "#daa520#9d58ec#7a7a46#944917#39466b#b3258a#7c3ce4#317a3b#f6f675#e0b0ff#4f54d2#e905ef"];
 	
 	// Dont Hard code IPFS to a static address. 
-	var arrayOfIpfs = [];
-	for (var i=0; i<20; i++) {
-		// Set back things to the color
-		var colors = arrayOfBulkColors[i].substring(1).split("#");		
-		document.getElementById("cardBorderColor").value = colors[0];
-        document.getElementById("cardBackgroundColor").value = colors[1];
-        document.getElementById("digitOneColor").value = colors[2];
-        document.getElementById("digitOneBorder").value = colors[3];
-        document.getElementById("digitTwoColor").value = colors[4];
-        document.getElementById("digitTwoBorder").value = colors[5];
-        document.getElementById("digitThreeColor").value = colors[6];
-        document.getElementById("digitThreeBorder").value = colors[7];
-        document.getElementById("digitFourColor").value = colors[8];
-        document.getElementById("digitFourBorder").value = colors[9];
-        document.getElementById("digitcarpalPadColor").value = colors[10];
-        document.getElementById("digitcarpalPadBorder").value = colors[11];
-		var s = new XMLSerializer();
-		let svg = s.serializeToString(this.svgelement.current);
-		const cid = await ipfs.add(svg);
-		let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;
-		console.log(uri);
-		arrayOfIpfs.push(uri);
-	}
+	var arrayOfIpfs = ["https://bafybeicvrmkangk3tmwd2an3biipr2whwwsbnisyxbbjqy5xipodqiybka.ipfs.infura-ipfs.io/", "https://bafybeiav7hfw3slcsqfgylxf3t3jbvnwsylnxrkxdypjyhmtdcjfzsdyme.ipfs.infura-ipfs.io/", "https://bafybeidswbcdooixkfh6s42wyvztqensmg357ohk2ibslwwcgetkxvpc34.ipfs.infura-ipfs.io/", "https://bafybeihovm4jpnd7ulerunvhfjjtffotpzvfv7k7wj7s6yxguqd7o6paaq.ipfs.infura-ipfs.io/", "https://bafybeicrqfccqrfn4sx6vs3pedodknu6bvfz4nucx6ug6ore7vjexrid4m.ipfs.infura-ipfs.io/", "https://bafybeibkjb5ppzhi6f7ezzcikagcikvwklx3a6hl7bnwkcjg53xcjb3uoq.ipfs.infura-ipfs.io/", "https://bafybeian4lkb6gdwk2fe7xveszuzfwyi77nspgjflblfr2bwv3b7jgmuce.ipfs.infura-ipfs.io/", "https://bafybeiexmxcbne6y4babgtpjmltmtndqpvemukh6zddvph3dfbtdyin7h4.ipfs.infura-ipfs.io/", "https://bafybeiful7ggxukoctsey6qnfzow2d5os5tzjfcgbzq65iuknr5ubkerqu.ipfs.infura-ipfs.io/", "https://bafybeidb3pkux3eeq6lnlk4osdsnj5pp6rdxc7juxrgoatk3jq3h4xjtby.ipfs.infura-ipfs.io/", "https://bafybeicedrjf5i7ediq4gr3ezot4x2rbsu6gjcpkpvdgdeplanto6q4da4.ipfs.infura-ipfs.io/", "https://bafybeico54x4j6qapdk2hz4odn3z5k3hcvw23kxpxdazwoemkf4isxsqjm.ipfs.infura-ipfs.io/", "https://bafybeibmyef35hldz76nfqf7a7wn7sg644xc2yji6uf6ndqqmihuj56uhy.ipfs.infura-ipfs.io/", "https://bafybeidi62brmpxum5nsfmdd2puosyn7f3uawpo2oirqbe2e7emmosxytm.ipfs.infura-ipfs.io/", "https://bafybeifmdtqegplgjaptlarebmkoh4ki37neq4xhsj674tuttvsasgamzy.ipfs.infura-ipfs.io/", "https://bafybeicto42ox4xubts6zgrybtsbnlcwqii5ozqpjufc6kedrvawwzewrq.ipfs.infura-ipfs.io/", "https://bafybeidnwy3ei7j7w6ldhaw5oghyrgqorwzgc7yigvnksbqjti7prc6soy.ipfs.infura-ipfs.io/", "https://bafybeieba54ab6o7dhbtfush7fxucmzjs5djrudabe5lxkfqsqqwctgrf4.ipfs.infura-ipfs.io/", "https://bafybeibx7wazzmjue4tcvvdt3zsb6vxajmf4sjuefjpg2cowdnejdy3oyy.ipfs.infura-ipfs.io/", "https://bafybeib3xnnr7fzlh64r5mpmhouf55wajq3iac7zenu6r77dwwnkerg6ru.ipfs.infura-ipfs.io/"];
 	console.log(arrayOfIpfs);
-	this.props.bulkMint(
+	this.props.massMintNTFs(
 		arrayOfIpfs
     );
   }
@@ -98,7 +77,16 @@ class FormAndPreview extends Component {
             <h5>Make your own CryptoPaw!</h5>
           </div>
         </div>
-		<button onSubmit={this.callMassMintFromApp}>Mass Mint</button>
+        <form onSubmit={this.callMassMintFromApp} className="pt-4 mt-1">
+		<button
+                id="massMintBtn"
+                style={{ fontSize: "0.9rem", letterSpacing: "0.14rem" }}
+                type="submit"
+                className="btn mt-4 btn-block btn-outline-primary"
+              >
+                Mass Mint
+              </button>
+		</form>
         <form onSubmit={this.callMintMyNFTFromApp} className="pt-4 mt-1">
           <div className="row">
             <div className="col-md-3">

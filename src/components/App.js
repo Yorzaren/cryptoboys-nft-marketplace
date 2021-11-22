@@ -153,6 +153,7 @@ class App extends Component {
     }
 	console.log(colorString.toString());
 	alert(colorString);
+	console.log(uri);
     const colorsUsed = await this.state.cryptoPawsContract.methods
       .creationStrs(colorString)
       .call();
@@ -185,9 +186,10 @@ class App extends Component {
     }
   };
 
-  massMintNTF = async (uriArray) => {
+  massMintNTFs = async (uriArray) => {
 	this.state.cryptoPawsContract.methods
       .bulkMint(uriArray)
+	  .send({ from: this.state.accountAddress })
       .on("confirmation", () => {
           this.setState({ loading: false });
           window.location.hash = "#/my-tokens"; // Move them to their token page after minting
@@ -260,7 +262,7 @@ class App extends Component {
                     colorIsUsed={this.state.colorIsUsed}
                     colorsUsed={this.state.colorsUsed}
                     setMintBtnTimer={this.setMintBtnTimer}
-					massMintNTF={this.massMintNTF}
+					massMintNTFs={this.massMintNTFs}
                   />
                 )}
               />
