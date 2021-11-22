@@ -149,8 +149,10 @@ class App extends Component {
     const colorsArray = Object.values(colors);
     let colorString = "";
     for (let i = 0; i < colorsArray.length; i++) {
-      colorString += colorsArray[i].toString;
+      colorString += colorsArray[i].toString();
     }
+	console.log(colorString.toString());
+	alert(colorString);
     const colorsUsed = await this.state.cryptoPawsContract.methods
       .creationStrs(colorString)
       .call();
@@ -183,6 +185,15 @@ class App extends Component {
     }
   };
 
+  massMintNTF = async (uriArray) => {
+	this.state.cryptoPawsContract.methods
+      .bulkMint(uriArray)
+      .on("confirmation", () => {
+          this.setState({ loading: false });
+          window.location.hash = "#/my-tokens"; // Move them to their token page after minting
+		  window.location.reload(); // Sometimes it doesn't have the most up to date info so just refresh to fix it.
+        });
+  }
   toggleForSale = (tokenId) => {
     this.setState({ loading: true });
     this.state.cryptoPawsContract.methods
@@ -249,6 +260,7 @@ class App extends Component {
                     colorIsUsed={this.state.colorIsUsed}
                     colorsUsed={this.state.colorsUsed}
                     setMintBtnTimer={this.setMintBtnTimer}
+					massMintNTF={this.massMintNTF}
                   />
                 )}
               />
