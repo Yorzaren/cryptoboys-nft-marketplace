@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
-    <nav className="navbar navbar-fullwidth -md navbar-dark bg-dark">
+    <nav className="navbar navbar-expand-md navbar-dark bg-dark justify-content-center">
       <div className="container-fullwidth">
         <img src={icon} alt="" />
         <Link to="/" className="navbar-brand ml-2">
