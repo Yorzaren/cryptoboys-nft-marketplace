@@ -36,6 +36,7 @@ class FormAndPreview extends Component {
 
   componentDidMount = async () => {
     await this.props.setMintBtnTimer();
+	await this.props.checkIfPresaleActive();
   };
 
   callMintMyNFTFromApp = async (e) => {
@@ -51,6 +52,21 @@ class FormAndPreview extends Component {
       uri
     );
   };
+  // Functionally the same as callMintMyNFTFromApp but requires that the presale time is not up.
+  callPresaleMintFromApp = async (e) => {
+	e.preventDefault();
+    var s = new XMLSerializer();
+    let svg = s.serializeToString(this.svgelement.current);
+    const cid = await ipfs.add(svg);
+    let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;
+	console.log(uri);
+    this.props.presaleMint(
+      this.state.userSelectedColors[0],
+      this.state.cryptoPawName,
+      this.state.cryptoPawPrice,
+      uri
+    );
+  }
   getRandomColor = () => {
 	  return "#"+Math.floor(Math.random()*16777215).toString(16);
   };
@@ -391,6 +407,15 @@ class FormAndPreview extends Component {
                 className="btn mt-4 btn-block btn-outline-primary"
               >
                 Mint My CryptoPaw
+              </button>
+			  <button
+                id="presaleMint"
+                style={{ fontSize: "0.9rem", letterSpacing: "0.14rem" }}
+                type="submit"
+                className="btn mt-4 btn-block btn-outline-primary"
+				onClick={this.callPresaleMintFromApp}
+              >
+                PreSale Mint
               </button>
               <div className="mt-4">
                 {this.props.nameIsUsed ? (

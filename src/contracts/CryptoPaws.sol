@@ -5,7 +5,9 @@ pragma abicoder v2;
 import "./ERC721.sol";
 
 contract CryptoPaws is ERC721 {
-
+	address private owner;
+	uint public startTime;
+	
     // name of paw collection for contract
     string public collectionName;
     // symbol for paw tokens
@@ -36,8 +38,8 @@ contract CryptoPaws is ERC721 {
         uint256 timesTransferred;
         bool forSale;
     }
-
-    // map tokenId to a Paw
+    
+	// map tokenId to a Paw
     mapping(uint256 => CryptoPaw) public allPaws;
 
     mapping(string => bool) public nameExists;
@@ -50,6 +52,13 @@ contract CryptoPaws is ERC721 {
     constructor() ERC721("Original CryptoPaws Collection","PAW") {
         collectionName = name();
         collectionNameSymbol = symbol();
+		owner = msg.sender;
+		startTime = block.timestamp;
+    }
+
+	modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
     }
 
     // minting function for new PAW
@@ -107,7 +116,11 @@ contract CryptoPaws is ERC721 {
         uint256 totalNumberOfTokensMinted = totalSupply();
         return totalNumberOfTokensMinted;
     }
-
+	
+	function getStartTime() public view returns(uint256) {
+		return startTime;
+	}
+		
     //get number of tokens owned by an address
     function getTotalNumberOwnedByAddress(address _owner) public view returns(uint256) {
         uint totalNumberOfTokensOwned = balanceOf(_owner);
@@ -184,5 +197,43 @@ contract CryptoPaws is ERC721 {
         } else {
             allPaws[_tokenId].forSale = true;
         }
+    }
+	
+	// Same as mintPaw() but with zero cost, lasts 15 minutes; Make sure it aligns with 
+	function presalePaw(string memory _name, string memory _creationStr, uint _price, string memory _tokenURI) external payable{
+        //make sure address exists and isnt a 0 address
+        require(msg.sender != address(0), "Non-zero addresses only");
+        //make sure the premint time is not over
+        require(block.timestamp <= startTime + 5 minutes, "The Presale is over"); // MAKE THE TIME IS CONNECT TO App.js --> checkIfPresaleActive()
+        //increment the collection counter
+        pawCounter++;
+        //pawCounter is the tokenid in this case
+        require(!_exists(pawCounter), "collection counter not found");
+        //checks that color combo does not already exist
+        require(!creationStrs[_creationStr], "this paw print already exists");
+        //checks that uri is new
+        require(!tokenURIExists[_tokenURI], "the URI already exists");
+
+        //mint time baby
+        _mint(msg.sender, pawCounter);
+        //set the URI for the token
+        _setTokenURI(pawCounter, _tokenURI);
+        
+        //add URI to URI list
+        tokenURIExists[_tokenURI] = true;
+        
+        
+        CryptoPaw memory newCryptoPaw = CryptoPaw(
+            pawCounter,
+            _name,
+            _creationStr,
+            _tokenURI,
+            payable(msg.sender),
+            payable(msg.sender),
+            _price,
+            0,
+            false);
+
+            allPaws[pawCounter] = newCryptoPaw;
     }
 }
