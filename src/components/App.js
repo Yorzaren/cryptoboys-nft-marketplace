@@ -32,6 +32,7 @@ class App extends Component {
       colorIsUsed: false,
       colorsUsed: [],
       lastMintTime: null,
+	  startTime: 0,
     };
   }
 
@@ -39,6 +40,7 @@ class App extends Component {
     await this.loadWeb3();
     await this.loadBlockchainData();
     await this.setMintBtnTimer();
+	await this.checkIfPresaleActive();
   };
 
   setMintBtnTimer = () => {
@@ -126,6 +128,11 @@ class App extends Component {
           .call();
         totalTokensMinted = totalTokensMinted.toNumber();
         this.setState({ totalTokensMinted });
+		let startTime = await cryptoPawsContract.methods
+          .getStartTime()
+          .call();
+        startTime = startTime.toNumber();
+        this.setState({ startTime });
         let totalTokensOwnedByAccount = await cryptoPawsContract.methods
           .getTotalNumberOwnedByAddress(this.state.accountAddress)
           .call();
@@ -143,7 +150,32 @@ class App extends Component {
     this.setState({ metamaskConnected: true });
     window.location.reload();
   };
-
+  
+  // If the presale is active show the presale button otherwise, hide it and display the regular button.
+  checkIfPresaleActive = async () => {
+	const presaleMint = document.getElementById("presaleMint");
+	const mintBtn = document.getElementById("mintBtn");
+	if (mintBtn !== undefined && mintBtn !== null) {
+		var theContractStarted = this.state.startTime*1000; // This come from the contract; Times 1000 to make it a modern date.
+		// This is related to the contract which will fail if people call it after the presale ends.
+		// SEE: CryptoPaws.sol -- presalePaw()
+		var untilEndInMinutes = (5*60)*1000; // Sale Lasts for 5 minutes; 
+		var saleEndsAt = theContractStarted+untilEndInMinutes;
+		console.log("Presale Started at: "+theContractStarted);
+		console.log("Presale Ends: "+saleEndsAt);
+		console.log("Current time: "+Date.now());
+		var allowed = Date.now()<=saleEndsAt;
+		console.log("Presale is active: "+ allowed);
+		if (Date.now()<=saleEndsAt) { // If presale is active show the presale button
+			presaleMint.hidden=false;
+			mintBtn.hidden=true;
+		} else {
+			presaleMint.hidden=true;
+			mintBtn.hidden=false;
+		}	
+	}
+  }
+  
   mintMyNFT = async (colors, name, tokenPrice, uri) => {
     this.setState({ loading: true });
     const colorsArray = Object.values(colors);
@@ -151,9 +183,6 @@ class App extends Component {
     for (let i = 0; i < colorsArray.length; i++) {
       colorString += colorsArray[i].toString();
     }
-	console.log(colorString.toString());
-	alert(colorString);
-	console.log(uri);
     const colorsUsed = await this.state.cryptoPawsContract.methods
       .creationStrs(colorString)
       .call();
@@ -186,16 +215,42 @@ class App extends Component {
     }
   };
 
-  massMintNTFs = async (uriArray) => {
-	this.state.cryptoPawsContract.methods
-      .bulkMint(uriArray)
-	  .send({ from: this.state.accountAddress })
-      .on("confirmation", () => {
+  presaleMint = async (colors, name, tokenPrice, uri) => {
+    this.setState({ loading: true });
+    const colorsArray = Object.values(colors);
+    let colorString = "";
+    for (let i = 0; i < colorsArray.length; i++) {
+      colorString += colorsArray[i].toString();
+    }
+    const colorsUsed = await this.state.cryptoPawsContract.methods
+      .creationStrs(colorString)
+      .call();
+    const nameIsUsed = await this.state.cryptoPawsContract.methods
+      .nameExists(name)
+      .call();
+    if (!colorsUsed && !nameIsUsed) {
+
+      const price = window.web3.utils.toWei(tokenPrice.toString(), "Ether");
+      this.state.cryptoPawsContract.methods
+        .presalePaw(name, colorString, price, uri)
+        .send({ from: this.state.accountAddress })
+        .on("confirmation", () => {
           this.setState({ loading: false });
           window.location.hash = "#/my-tokens"; // Move them to their token page after minting
 		  window.location.reload(); // Sometimes it doesn't have the most up to date info so just refresh to fix it.
         });
-  }
+    } else {
+      if (nameIsUsed) {
+        this.setState({ nameIsUsed: true });
+        this.setState({ loading: false });
+      } else if (colorsUsed) {
+        this.setState({ colorIsUsed: true });
+        this.setState({ colorsUsed });
+        this.setState({ loading: false });
+      }
+    }
+  };
+  
   toggleForSale = (tokenId) => {
     this.setState({ loading: true });
     this.state.cryptoPawsContract.methods
@@ -262,7 +317,8 @@ class App extends Component {
                     colorIsUsed={this.state.colorIsUsed}
                     colorsUsed={this.state.colorsUsed}
                     setMintBtnTimer={this.setMintBtnTimer}
-					massMintNTFs={this.massMintNTFs}
+					presaleMint={this.presaleMint}
+					checkIfPresaleActive={this.checkIfPresaleActive}
                   />
                 )}
               />
