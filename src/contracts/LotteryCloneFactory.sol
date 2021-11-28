@@ -3,7 +3,7 @@ pragma solidity  >=0.8.0;
 
 import "./CryptoPaws.sol";
 import "./Lottery.sol";
-import '@openzeppelin/upgrades/contracts/upgradeability/ProxyFactory.sol';
+import './ProxyFactory.sol';
 
 contract LotteryFactory is ProxyFactory {
     CryptoPaws cp;
@@ -26,14 +26,14 @@ contract LotteryFactory is ProxyFactory {
         bytes memory payload = abi.encodeWithSignature("initialize(uint256, uint256, address)", _id, _enterPrice, msg.sender);
         address lotto = deployMinimal(implementationContract, payload);
         cp.lottoTransferTo(_id, lotto);
-        owners[_msg.sender] = _id;
+        owners[msg.sender] = _id;
         lotteries[_id] = lotto;
     }
 
     function claim(uint256 _id) public {
         address cont = lotteries[_id];
         Lottery lottoCont = Lottery(cont);
-        Lwinner = lottoCont.winner();
+        address Lwinner = lottoCont.winner();
         require(msg.sender == Lwinner, "You are not the winner");
         cp.lottoTransferFrom(_id, cont, Lwinner);
 
