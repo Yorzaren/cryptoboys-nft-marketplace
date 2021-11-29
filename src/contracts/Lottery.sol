@@ -77,6 +77,7 @@ contract Lottery is Initializable {
     address[] public entrants;
     uint256 private key;
     address public winner;
+    uint256 public entrantscount;
     bool public finished;
 
 
@@ -92,6 +93,7 @@ contract Lottery is Initializable {
         key = 0;
         winner = address(0);
         finished = false;
+        entrantscount = 0;
     }
 
     function enterLottery() public payable {
@@ -100,6 +102,7 @@ contract Lottery is Initializable {
         require(msg.value >= entryPrice, "Must pay full entry price");
         entered[msg.sender] = true;
         entrants.push(msg.sender);
+        entrantscount += 1;
     }
 
     function endLottery() public onlyOwner {

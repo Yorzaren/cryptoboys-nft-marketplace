@@ -47,7 +47,7 @@ truffle compile
 ```
 #### Deploy smart contract to ganache
 ```
-truffle migrate
+truffle migrate --reset
 ```
 #### Start DApp
 ```

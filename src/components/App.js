@@ -3,6 +3,7 @@ import { HashRouter, Route } from "react-router-dom";
 import "./App.css";
 import Web3 from "web3";
 import CryptoPaws from "../abis/CryptoPaws.json";
+import LotteryFactory from "../abis/LotteryFactory.json";
 
 import FormAndPreview from "../components/FormAndPreview/FormAndPreview";
 import AllCryptoPaws from "./AllCryptoPaws/AllCryptoPaws";
@@ -13,6 +14,7 @@ import Loading from "./Loading/Loading";
 import Navbar from "./Navbar/Navbar";
 import MyCryptoPaws from "./MyCryptoPaws/MyCryptoPaws";
 import Queries from "./Queries/Queries";
+import Lotteries from "./Lottery/Lotteries";
 
 class App extends Component {
   constructor(props) {
@@ -20,6 +22,7 @@ class App extends Component {
     this.state = {
       accountAddress: "",
       accountBalance: "",
+      FactoryContract: null,
       cryptoPawsContract: null,
       cryptoPawsCount: 0,
       cryptoPaws: [],
@@ -103,12 +106,18 @@ class App extends Component {
       this.setState({ loading: false });
       const networkId = await web3.eth.net.getId();
       const networkData = CryptoPaws.networks[networkId];
-      if (networkData) {
+      const factoryNetworkData = LotteryFactory.networks[networkId];
+      if (networkData && factoryNetworkData) {
         this.setState({ loading: true });
         const cryptoPawsContract = web3.eth.Contract(
           CryptoPaws.abi,
           networkData.address
         );
+        const FactoryContract = web3.eth.Contract(
+          LotteryFactory.abi,
+          factoryNetworkData.address
+        );
+        this.setState({ FactoryContract });
         this.setState({ cryptoPawsContract });
         this.setState({ contractDetected: true });
         const cryptoPawsCount = await cryptoPawsContract.methods
@@ -165,7 +174,6 @@ class App extends Component {
 		console.log("Presale Ends: "+saleEndsAt);
 		console.log("Current time: "+Date.now());
 		var allowed = Date.now()<=saleEndsAt;
-		this.calcPresaleRemainingTimer();
 		console.log("Presale is active: "+ allowed);
 		if (Date.now()<=saleEndsAt) { // If presale is active show the presale button
 			presaleMint.hidden=false;
@@ -175,28 +183,6 @@ class App extends Component {
 			mintBtn.hidden=false;
 		}	
 	}
-  }
-  
-  calcPresaleRemainingTimer = () => {
-	const presaleMint = document.getElementById("presaleMint");
-	const mintBtn = document.getElementById("mintBtn");
-	var theContractStarted = this.state.startTime*1000; // This come from the contract; Times 1000 to make it a modern date.
-	const saleTime = (5*60)*1000; // Sale Lasts for 5 minutes; 
-	const saleEnds = theContractStarted+saleTime;
-	const interval = setInterval(() => {
-      const now = new Date().getTime();
-      const diff = saleEnds - now;
-      if (diff < 0) { // If the person is on the page as it finished change it so the button is different.
-		presaleMint.setAttribute("disabled", true);
-		presaleMint.hidden=true;
-		mintBtn.hidden=false;
-        clearInterval(interval);
-      } else {
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        presaleMint.innerHTML = `<span style="color:red;fontWeight:bold;">Presale Lasts ${minutes}m ${seconds}s</span>`;
-      }
-    }, 1000);
   }
   
   mintMyNFT = async (colors, name, tokenPrice, uri) => {
@@ -355,6 +341,7 @@ class App extends Component {
                     changeTokenPrice={this.changeTokenPrice}
                     toggleForSale={this.toggleForSale}
                     buyCryptoPaw={this.buyCryptoPaw}
+                    lotteryContract={this.state.FactoryContract}
                   />
                 )}
               />
@@ -368,6 +355,15 @@ class App extends Component {
                       this.state.totalTokensOwnedByAccount
                     }
                   />
+                )}
+              />
+              <Route
+                path="/lotteries"
+                render={() => (
+                  <Lotteries
+                  cryptoPawsContract={this.state.cryptoPawsContract}
+                  accountAddress={this.state.accountAddress}
+                  lotteryContract={this.state.FactoryContract}/>
                 )}
               />
               <Route
