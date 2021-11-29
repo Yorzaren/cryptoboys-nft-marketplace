@@ -1,19 +1,6 @@
 import React from "react";
-const CryptoBoyNFTImage = ({ colors }) => {
-	// TODO: Refactor the old stuff across the project
-	// cardBorderColor and cardBackgroundColor will stay but everything else will have to be removed and bound to a different name.
-	
-	// digitOneColor
-	// digitOneBorder
-	// digitTwoColor
-	// digitTwoBorder
-	// digitThreeColor
-	// digitThreeBorder
-	// digitFourColor
-	// digitFourBorder
-	// digitcarpalPadColor
-	// digitcarpalPadBorder
-	// 
+function CryptoPawNFTImagePreview(props) {
+
   const {
     cardBorderColor,
     cardBackgroundColor,
@@ -27,7 +14,7 @@ const CryptoBoyNFTImage = ({ colors }) => {
     digitFourBorder,
     digitcarpalPadColor,
     digitcarpalPadBorder,
-  } = colors;
+  } = props.colors;
 
   // Keep
   const card = {
@@ -62,8 +49,8 @@ const CryptoBoyNFTImage = ({ colors }) => {
   };
   return (
 	<div className="App">
-      <svg width="300px" height="300px" clipRule="evenodd" fillRule="evenodd" strokeLinecap="round" strokeLinejoin="round" strokeMiterlimit="1.5" version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <rect class="background" x="20" y="20" width="460" height="460" style={card}/>
+      <svg ref={props.svgref} width="300px" height="300px" clipRule="evenodd" fillRule="evenodd" strokeLinecap="round" strokeLinejoin="round" strokeMiterlimit="1.5" version="1.1" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+        <rect className="background" x="20" y="20" width="460" height="460" style={card}/>
 		<g>
 			<path style={digitOne} d="M55.304,222.068c6.506,-11.055 69.179,-4.838 103.217,28.829c34.039,33.667 23.061,52.156 13.887,81.46c-7.608,24.299 -21.432,33.656 -42.053,47.198c-4.017,2.637 -36.989,-11.698 -64.329,-68.206c-12.689,-26.227 -17.124,-78.4 -10.722,-89.281Z"/>
 			<path style={digitTwo} d="M126.994,82.566c-9.207,4.464 -38.935,49.748 3.361,117.739c24.818,39.898 53.299,44.92 75.05,32.365c21.751,-12.555 31.823,-47.678 10.721,-93.466c-28.03,-60.823 -79.925,-61.102 -89.132,-56.638Z"/>
@@ -76,4 +63,4 @@ const CryptoBoyNFTImage = ({ colors }) => {
   );
 };
 
-export default CryptoBoyNFTImage;
+export default CryptoPawNFTImagePreview;
