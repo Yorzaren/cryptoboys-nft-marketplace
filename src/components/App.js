@@ -165,6 +165,7 @@ class App extends Component {
 		console.log("Presale Ends: "+saleEndsAt);
 		console.log("Current time: "+Date.now());
 		var allowed = Date.now()<=saleEndsAt;
+		this.calcPresaleRemainingTimer();
 		console.log("Presale is active: "+ allowed);
 		if (Date.now()<=saleEndsAt) { // If presale is active show the presale button
 			presaleMint.hidden=false;
@@ -174,6 +175,28 @@ class App extends Component {
 			mintBtn.hidden=false;
 		}	
 	}
+  }
+  
+  calcPresaleRemainingTimer = () => {
+	const presaleMint = document.getElementById("presaleMint");
+	const mintBtn = document.getElementById("mintBtn");
+	var theContractStarted = this.state.startTime*1000; // This come from the contract; Times 1000 to make it a modern date.
+	const saleTime = (5*60)*1000; // Sale Lasts for 5 minutes; 
+	const saleEnds = theContractStarted+saleTime;
+	const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = saleEnds - now;
+      if (diff < 0) { // If the person is on the page as it finished change it so the button is different.
+		presaleMint.setAttribute("disabled", true);
+		presaleMint.hidden=true;
+		mintBtn.hidden=false;
+        clearInterval(interval);
+      } else {
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        presaleMint.innerHTML = `<span style="color:red;fontWeight:bold;">Presale Lasts ${minutes}m ${seconds}s</span>`;
+      }
+    }, 1000);
   }
   
   mintMyNFT = async (colors, name, tokenPrice, uri) => {

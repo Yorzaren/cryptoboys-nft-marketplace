@@ -199,7 +199,8 @@ contract CryptoPaws is ERC721 {
         }
     }
 	
-	// Same as mintPaw() but with zero cost, lasts 15 minutes; Make sure it aligns with 
+	// Same as mintPaw() but with zero cost, lasts 5 minutes; Make sure it aligns with App.js
+	// So that people don't attempt to call a method that will fail.
 	function presalePaw(string memory _name, string memory _creationStr, uint _price, string memory _tokenURI) external payable{
         //make sure address exists and isnt a 0 address
         require(msg.sender != address(0), "Non-zero addresses only");
