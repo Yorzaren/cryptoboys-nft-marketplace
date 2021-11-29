@@ -3,6 +3,7 @@ import { HashRouter, Route } from "react-router-dom";
 import "./App.css";
 import Web3 from "web3";
 import CryptoPaws from "../abis/CryptoPaws.json";
+import LotteryFactory from "../abis/LotteryFactory.json";
 
 import FormAndPreview from "../components/FormAndPreview/FormAndPreview";
 import AllCryptoPaws from "./AllCryptoPaws/AllCryptoPaws";
@@ -13,6 +14,7 @@ import Loading from "./Loading/Loading";
 import Navbar from "./Navbar/Navbar";
 import MyCryptoPaws from "./MyCryptoPaws/MyCryptoPaws";
 import Queries from "./Queries/Queries";
+import Lotteries from "./Lottery/Lotteries";
 
 class App extends Component {
   constructor(props) {
@@ -20,6 +22,7 @@ class App extends Component {
     this.state = {
       accountAddress: "",
       accountBalance: "",
+      FactoryContract: null,
       cryptoPawsContract: null,
       cryptoPawsCount: 0,
       cryptoPaws: [],
@@ -103,12 +106,18 @@ class App extends Component {
       this.setState({ loading: false });
       const networkId = await web3.eth.net.getId();
       const networkData = CryptoPaws.networks[networkId];
-      if (networkData) {
+      const factoryNetworkData = LotteryFactory.networks[networkId];
+      if (networkData && factoryNetworkData) {
         this.setState({ loading: true });
         const cryptoPawsContract = web3.eth.Contract(
           CryptoPaws.abi,
           networkData.address
         );
+        const FactoryContract = web3.eth.Contract(
+          LotteryFactory.abi,
+          factoryNetworkData.address
+        );
+        this.setState({ FactoryContract });
         this.setState({ cryptoPawsContract });
         this.setState({ contractDetected: true });
         const cryptoPawsCount = await cryptoPawsContract.methods
@@ -332,6 +341,7 @@ class App extends Component {
                     changeTokenPrice={this.changeTokenPrice}
                     toggleForSale={this.toggleForSale}
                     buyCryptoPaw={this.buyCryptoPaw}
+                    lotteryContract={this.state.FactoryContract}
                   />
                 )}
               />
@@ -345,6 +355,15 @@ class App extends Component {
                       this.state.totalTokensOwnedByAccount
                     }
                   />
+                )}
+              />
+              <Route
+                path="/lotteries"
+                render={() => (
+                  <Lotteries
+                  cryptoPawsContract={this.state.cryptoPawsContract}
+                  accountAddress={this.state.accountAddress}
+                  lotteryContract={this.state.FactoryContract}/>
                 )}
               />
               <Route
