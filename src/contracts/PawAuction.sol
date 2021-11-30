@@ -3,7 +3,7 @@ contract PawAuction {
     // Parameters of the auction. Times are either
     // absolute unix timestamps (seconds since 1970-01-01)
     // or time periods in seconds.
-    address payable public beneficiary;
+    address payable public owner;
     uint public auctionEndTime;
 
     // Current state of the auction.
@@ -44,9 +44,9 @@ contract PawAuction {
     /// beneficiary address `beneficiaryAddress`.
     constructor(
         uint biddingTime,
-        address payable beneficiaryAddress
+        address payable ownerAddress
     ) {
-        beneficiary = beneficiaryAddress;
+        owner = ownerAddress;
         auctionEndTime = block.timestamp + biddingTime;
     }
 
@@ -132,6 +132,6 @@ contract PawAuction {
         emit AuctionEnded(highestBidder, highestBid);
 
         // 3. Interaction
-        beneficiary.transfer(highestBid);
+        owner.transfer(highestBid);
     }
 }
