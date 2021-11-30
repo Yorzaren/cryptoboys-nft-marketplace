@@ -2,24 +2,19 @@ import React, { Component } from "react";
 import { HashRouter, Route } from "react-router-dom";
 import "./App.css";
 import Web3 from "web3";
-import CryptoBoys from "../abis/CryptoBoys.json";
+import CryptoPaws from "../abis/CryptoPaws.json";
+import LotteryFactory from "../abis/LotteryFactory.json";
 
 import FormAndPreview from "../components/FormAndPreview/FormAndPreview";
-import AllCryptoBoys from "./AllCryptoBoys/AllCryptoBoys";
+import AllCryptoPaws from "./AllCryptoPaws/AllCryptoPaws";
 import AccountDetails from "./AccountDetails/AccountDetails";
 import ContractNotDeployed from "./ContractNotDeployed/ContractNotDeployed";
 import ConnectToMetamask from "./ConnectMetamask/ConnectToMetamask";
 import Loading from "./Loading/Loading";
 import Navbar from "./Navbar/Navbar";
-import MyCryptoBoys from "./MyCryptoBoys/MyCryptoBoys";
+import MyCryptoPaws from "./MyCryptoPaws/MyCryptoPaws";
 import Queries from "./Queries/Queries";
-
-const ipfsClient = require("ipfs-http-client");
-const ipfs = ipfsClient({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-});
+import Lotteries from "./Lottery/Lotteries";
 
 class App extends Component {
   constructor(props) {
@@ -27,9 +22,10 @@ class App extends Component {
     this.state = {
       accountAddress: "",
       accountBalance: "",
-      cryptoBoysContract: null,
-      cryptoBoysCount: 0,
-      cryptoBoys: [],
+      FactoryContract: null,
+      cryptoPawsContract: null,
+      cryptoPawsCount: 0,
+      cryptoPaws: [],
       loading: true,
       metamaskConnected: false,
       contractDetected: false,
@@ -39,14 +35,15 @@ class App extends Component {
       colorIsUsed: false,
       colorsUsed: [],
       lastMintTime: null,
+	  startTime: 0,
     };
   }
 
   componentWillMount = async () => {
     await this.loadWeb3();
     await this.loadBlockchainData();
-    await this.setMetaData();
     await this.setMintBtnTimer();
+	await this.checkIfPresaleActive();
   };
 
   setMintBtnTimer = () => {
@@ -56,7 +53,7 @@ class App extends Component {
         lastMintTime: localStorage.getItem(this.state.accountAddress),
       });
       this.state.lastMintTime === undefined || this.state.lastMintTime === null
-        ? (mintBtn.innerHTML = "Mint My Crypto Boy")
+        ? (mintBtn.innerHTML = "Mint My CryptoPaw")
         : this.checkIfCanMint(parseInt(this.state.lastMintTime));
     }
   };
@@ -70,7 +67,7 @@ class App extends Component {
       const diff = countDownTime - now;
       if (diff < 0) {
         mintBtn.removeAttribute("disabled");
-        mintBtn.innerHTML = "Mint My Crypto Boy";
+        mintBtn.innerHTML = "Mint My CryptoPaw";
         localStorage.removeItem(this.state.accountAddress);
         clearInterval(interval);
       } else {
@@ -108,34 +105,45 @@ class App extends Component {
       this.setState({ accountBalance });
       this.setState({ loading: false });
       const networkId = await web3.eth.net.getId();
-      const networkData = CryptoBoys.networks[networkId];
-      if (networkData) {
+      const networkData = CryptoPaws.networks[networkId];
+      const factoryNetworkData = LotteryFactory.networks[networkId];
+      if (networkData && factoryNetworkData) {
         this.setState({ loading: true });
-        const cryptoBoysContract = web3.eth.Contract(
-          CryptoBoys.abi,
+        const cryptoPawsContract = web3.eth.Contract(
+          CryptoPaws.abi,
           networkData.address
         );
-        this.setState({ cryptoBoysContract });
+        const FactoryContract = web3.eth.Contract(
+          LotteryFactory.abi,
+          factoryNetworkData.address
+        );
+        this.setState({ FactoryContract });
+        this.setState({ cryptoPawsContract });
         this.setState({ contractDetected: true });
-        const cryptoBoysCount = await cryptoBoysContract.methods
-          .cryptoBoyCounter()
+        const cryptoPawsCount = await cryptoPawsContract.methods
+          .pawCounter()
           .call();
-        this.setState({ cryptoBoysCount });
-        for (var i = 1; i <= cryptoBoysCount; i++) {
-          const cryptoBoy = await cryptoBoysContract.methods
-            .allCryptoBoys(i)
+        this.setState({ cryptoPawsCount });
+        for (var i = 1; i <= cryptoPawsCount; i++) {
+          const cryptoPaw = await cryptoPawsContract.methods
+            .allPaws(i)
             .call();
           this.setState({
-            cryptoBoys: [...this.state.cryptoBoys, cryptoBoy],
+            cryptoPaws: [...this.state.cryptoPaws, cryptoPaw],
           });
         }
-        let totalTokensMinted = await cryptoBoysContract.methods
-          .getNumberOfTokensMinted()
+        let totalTokensMinted = await cryptoPawsContract.methods
+          .getTotalNumberMinted()
           .call();
         totalTokensMinted = totalTokensMinted.toNumber();
         this.setState({ totalTokensMinted });
-        let totalTokensOwnedByAccount = await cryptoBoysContract.methods
-          .getTotalNumberOfTokensOwnedByAnAddress(this.state.accountAddress)
+		let startTime = await cryptoPawsContract.methods
+          .getStartTime()
+          .call();
+        startTime = startTime.toNumber();
+        this.setState({ startTime });
+        let totalTokensOwnedByAccount = await cryptoPawsContract.methods
+          .getTotalNumberOwnedByAddress(this.state.accountAddress)
           .call();
         totalTokensOwnedByAccount = totalTokensOwnedByAccount.toNumber();
         this.setState({ totalTokensOwnedByAccount });
@@ -151,111 +159,87 @@ class App extends Component {
     this.setState({ metamaskConnected: true });
     window.location.reload();
   };
-
-  setMetaData = async () => {
-    if (this.state.cryptoBoys.length !== 0) {
-      this.state.cryptoBoys.map(async (cryptoboy) => {
-        const result = await fetch(cryptoboy.tokenURI);
-        const metaData = await result.json();
-        this.setState({
-          cryptoBoys: this.state.cryptoBoys.map((cryptoboy) =>
-            cryptoboy.tokenId.toNumber() === Number(metaData.tokenId)
-              ? {
-                  ...cryptoboy,
-                  metaData,
-                }
-              : cryptoboy
-          ),
-        });
-      });
-    }
-  };
-
-  mintMyNFT = async (colors, name, tokenPrice) => {
+  
+  // If the presale is active show the presale button otherwise, hide it and display the regular button.
+  checkIfPresaleActive = async () => {
+	const presaleMint = document.getElementById("presaleMint");
+	const mintBtn = document.getElementById("mintBtn");
+	if (mintBtn !== undefined && mintBtn !== null) {
+		var theContractStarted = this.state.startTime*1000; // This come from the contract; Times 1000 to make it a modern date.
+		// This is related to the contract which will fail if people call it after the presale ends.
+		// SEE: CryptoPaws.sol -- presalePaw()
+		var untilEndInMinutes = (5*60)*1000; // Sale Lasts for 5 minutes; 
+		var saleEndsAt = theContractStarted+untilEndInMinutes;
+		console.log("Presale Started at: "+theContractStarted);
+		console.log("Presale Ends: "+saleEndsAt);
+		console.log("Current time: "+Date.now());
+		var allowed = Date.now()<=saleEndsAt;
+		this.calcPresaleRemainingTimer();
+		console.log("Presale is active: "+ allowed);
+		if (Date.now()<=saleEndsAt) { // If presale is active show the presale button
+			presaleMint.hidden=false;
+			mintBtn.hidden=true;
+		} else {
+			presaleMint.hidden=true;
+			mintBtn.hidden=false;
+		}	
+	}
+  }
+  
+  calcPresaleRemainingTimer = () => {
+	const presaleMint = document.getElementById("presaleMint");
+	const mintBtn = document.getElementById("mintBtn");
+	var theContractStarted = this.state.startTime*1000; // This come from the contract; Times 1000 to make it a modern date.
+	const saleTime = (5*60)*1000; // Sale Lasts for 5 minutes; 
+	const saleEnds = theContractStarted+saleTime;
+	const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = saleEnds - now;
+      if (diff < 0) { // If the person is on the page as it finished change it so the button is different.
+		presaleMint.setAttribute("disabled", true);
+		presaleMint.hidden=true;
+		mintBtn.hidden=false;
+        clearInterval(interval);
+      } else {
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        presaleMint.innerHTML = `<span style="color:red;fontWeight:bold;">Presale Lasts ${minutes}m ${seconds}s</span>`;
+      }
+    }, 1000);
+  }
+  
+  mintMyNFT = async (colors, name, tokenPrice, uri) => {
     this.setState({ loading: true });
     const colorsArray = Object.values(colors);
-    let colorsUsed = [];
+    let colorString = "";
     for (let i = 0; i < colorsArray.length; i++) {
-      if (colorsArray[i] !== "") {
-        let colorIsUsed = await this.state.cryptoBoysContract.methods
-          .colorExists(colorsArray[i])
-          .call();
-        if (colorIsUsed) {
-          colorsUsed = [...colorsUsed, colorsArray[i]];
-        } else {
-          continue;
-        }
-      }
+      colorString += colorsArray[i].toString();
     }
-    const nameIsUsed = await this.state.cryptoBoysContract.methods
-      .tokenNameExists(name)
+    const colorsUsed = await this.state.cryptoPawsContract.methods
+      .creationStrs(colorString)
       .call();
-    if (colorsUsed.length === 0 && !nameIsUsed) {
-      const {
-        cardBorderColor,
-        cardBackgroundColor,
-        headBorderColor,
-        headBackgroundColor,
-        leftEyeBorderColor,
-        rightEyeBorderColor,
-        leftEyeBackgroundColor,
-        rightEyeBackgroundColor,
-        leftPupilBackgroundColor,
-        rightPupilBackgroundColor,
-        mouthColor,
-        neckBackgroundColor,
-        neckBorderColor,
-        bodyBackgroundColor,
-        bodyBorderColor,
-      } = colors;
-      let previousTokenId;
-      previousTokenId = await this.state.cryptoBoysContract.methods
-        .cryptoBoyCounter()
-        .call();
-      previousTokenId = previousTokenId.toNumber();
-      const tokenId = previousTokenId + 1;
-      const tokenObject = {
-        tokenName: "Crypto Boy",
-        tokenSymbol: "CB",
-        tokenId: `${tokenId}`,
-        name: name,
-        metaData: {
-          type: "color",
-          colors: {
-            cardBorderColor,
-            cardBackgroundColor,
-            headBorderColor,
-            headBackgroundColor,
-            leftEyeBorderColor,
-            rightEyeBorderColor,
-            leftEyeBackgroundColor,
-            rightEyeBackgroundColor,
-            leftPupilBackgroundColor,
-            rightPupilBackgroundColor,
-            mouthColor,
-            neckBackgroundColor,
-            neckBorderColor,
-            bodyBackgroundColor,
-            bodyBorderColor,
-          },
-        },
-      };
-      const cid = await ipfs.add(JSON.stringify(tokenObject));
-      let tokenURI = `https://ipfs.infura.io/ipfs/${cid.path}`;
+    const nameIsUsed = await this.state.cryptoPawsContract.methods
+      .nameExists(name)
+      .call();
+    if (!colorsUsed && !nameIsUsed) {
+
       const price = window.web3.utils.toWei(tokenPrice.toString(), "Ether");
-      this.state.cryptoBoysContract.methods
-        .mintCryptoBoy(name, tokenURI, price, colorsArray)
-        .send({ from: this.state.accountAddress })
+      let mintPrice;
+      mintPrice = await this.state.cryptoPawsContract.methods.mintPrice.call();
+      this.state.cryptoPawsContract.methods
+        .mintPaw(name, colorString, price, uri)
+        .send({ from: this.state.accountAddress, value: mintPrice })
         .on("confirmation", () => {
           localStorage.setItem(this.state.accountAddress, new Date().getTime());
           this.setState({ loading: false });
-          window.location.reload();
+          window.location.hash = "#/my-tokens"; // Move them to their token page after minting
+		  window.location.reload(); // Sometimes it doesn't have the most up to date info so just refresh to fix it.
         });
     } else {
       if (nameIsUsed) {
         this.setState({ nameIsUsed: true });
         this.setState({ loading: false });
-      } else if (colorsUsed.length !== 0) {
+      } else if (colorsUsed) {
         this.setState({ colorIsUsed: true });
         this.setState({ colorsUsed });
         this.setState({ loading: false });
@@ -263,9 +247,45 @@ class App extends Component {
     }
   };
 
+  presaleMint = async (colors, name, tokenPrice, uri) => {
+    this.setState({ loading: true });
+    const colorsArray = Object.values(colors);
+    let colorString = "";
+    for (let i = 0; i < colorsArray.length; i++) {
+      colorString += colorsArray[i].toString();
+    }
+    const colorsUsed = await this.state.cryptoPawsContract.methods
+      .creationStrs(colorString)
+      .call();
+    const nameIsUsed = await this.state.cryptoPawsContract.methods
+      .nameExists(name)
+      .call();
+    if (!colorsUsed && !nameIsUsed) {
+
+      const price = window.web3.utils.toWei(tokenPrice.toString(), "Ether");
+      this.state.cryptoPawsContract.methods
+        .presalePaw(name, colorString, price, uri)
+        .send({ from: this.state.accountAddress })
+        .on("confirmation", () => {
+          this.setState({ loading: false });
+          window.location.hash = "#/my-tokens"; // Move them to their token page after minting
+		  window.location.reload(); // Sometimes it doesn't have the most up to date info so just refresh to fix it.
+        });
+    } else {
+      if (nameIsUsed) {
+        this.setState({ nameIsUsed: true });
+        this.setState({ loading: false });
+      } else if (colorsUsed) {
+        this.setState({ colorIsUsed: true });
+        this.setState({ colorsUsed });
+        this.setState({ loading: false });
+      }
+    }
+  };
+  
   toggleForSale = (tokenId) => {
     this.setState({ loading: true });
-    this.state.cryptoBoysContract.methods
+    this.state.cryptoPawsContract.methods
       .toggleForSale(tokenId)
       .send({ from: this.state.accountAddress })
       .on("confirmation", () => {
@@ -277,7 +297,7 @@ class App extends Component {
   changeTokenPrice = (tokenId, newPrice) => {
     this.setState({ loading: true });
     const newTokenPrice = window.web3.utils.toWei(newPrice, "Ether");
-    this.state.cryptoBoysContract.methods
+    this.state.cryptoPawsContract.methods
       .changeTokenPrice(tokenId, newTokenPrice)
       .send({ from: this.state.accountAddress })
       .on("confirmation", () => {
@@ -286,9 +306,9 @@ class App extends Component {
       });
   };
 
-  buyCryptoBoy = (tokenId, price) => {
+  buyCryptoPaw = (tokenId, price) => {
     this.setState({ loading: true });
-    this.state.cryptoBoysContract.methods
+    this.state.cryptoPawsContract.methods
       .buyToken(tokenId)
       .send({ from: this.state.accountAddress, value: price })
       .on("confirmation", () => {
@@ -329,28 +349,31 @@ class App extends Component {
                     colorIsUsed={this.state.colorIsUsed}
                     colorsUsed={this.state.colorsUsed}
                     setMintBtnTimer={this.setMintBtnTimer}
+					presaleMint={this.presaleMint}
+					checkIfPresaleActive={this.checkIfPresaleActive}
                   />
                 )}
               />
               <Route
                 path="/marketplace"
                 render={() => (
-                  <AllCryptoBoys
+                  <AllCryptoPaws
                     accountAddress={this.state.accountAddress}
-                    cryptoBoys={this.state.cryptoBoys}
+                    cryptoPaws={this.state.cryptoPaws}
                     totalTokensMinted={this.state.totalTokensMinted}
                     changeTokenPrice={this.changeTokenPrice}
                     toggleForSale={this.toggleForSale}
-                    buyCryptoBoy={this.buyCryptoBoy}
+                    buyCryptoPaw={this.buyCryptoPaw}
+                    lotteryContract={this.state.FactoryContract}
                   />
                 )}
               />
               <Route
                 path="/my-tokens"
                 render={() => (
-                  <MyCryptoBoys
+                  <MyCryptoPaws
                     accountAddress={this.state.accountAddress}
-                    cryptoBoys={this.state.cryptoBoys}
+                    cryptoPaws={this.state.cryptoPaws}
                     totalTokensOwnedByAccount={
                       this.state.totalTokensOwnedByAccount
                     }
@@ -358,9 +381,18 @@ class App extends Component {
                 )}
               />
               <Route
+                path="/lotteries"
+                render={() => (
+                  <Lotteries
+                  cryptoPawsContract={this.state.cryptoPawsContract}
+                  accountAddress={this.state.accountAddress}
+                  lotteryContract={this.state.FactoryContract}/>
+                )}
+              />
+              <Route
                 path="/queries"
                 render={() => (
-                  <Queries cryptoBoysContract={this.state.cryptoBoysContract} />
+                  <Queries cryptoPawsContract={this.state.cryptoPawsContract} />
                 )}
               />
             </HashRouter>

@@ -8,7 +8,7 @@ const Navbar = () => {
       <div className="container">
         <img src={icon} alt="" />
         <Link to="/" className="navbar-brand ml-2">
-          NFT's
+          CryptoPaw NFTs
         </Link>
         <button
           className="navbar-toggler"
@@ -40,6 +40,11 @@ const Navbar = () => {
             <li className="nav-item">
               <Link to="/my-tokens" className="nav-link">
                 My Tokens
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/lotteries" className="nav-link">
+                Lotteries
               </Link>
             </li>
             <li className="nav-item">

@@ -5,17 +5,16 @@ const Queries = (props) => {
   const [tokenOwner, setTokenOwner] = useState("");
   const [tokenIdForOwnerNotFound, setTokenIdForOwnerNotFound] = useState(false);
 
-  const [tokenIdForMetadata, setTokenIdForMetadata] = useState("");
-  const [tokenMetadata, setTokenMetadata] = useState("");
-  const [tokenMetadataLink, setTokenMetadataLink] = useState("");
-  const [tokenIdForMetadataNotFound, setTokenIdForMetadataNotFound] = useState(
+  const [tokenIdForImage, setTokenIdForImage] = useState("");
+  const [tokenImageLink, setTokenImageLink] = useState("");
+  const [tokenIdForImageNotFound, setTokenIdForImageNotFound] = useState(
     false
   );
 
   const getTokenOwner = async (e) => {
     e.preventDefault();
     try {
-      const owner = await props.cryptoBoysContract.methods
+      const owner = await props.cryptoPawsContract.methods
         .getTokenOwner(tokenIdForOwner)
         .call();
       setTokenOwner(owner);
@@ -29,23 +28,19 @@ const Queries = (props) => {
     }
   };
 
-  const getTokenMetadata = async (e) => {
+  const getTokenImage = async (e) => {
     e.preventDefault();
     try {
-      const metadata = await props.cryptoBoysContract.methods
-        .getTokenMetaData(tokenIdForMetadata)
+      const image = await props.cryptoPawsContract.methods
+        .getTokenImg(tokenIdForImage)
         .call();
-      setTokenMetadata(
-        metadata.substr(0, 60) + "..." + metadata.slice(metadata.length - 5)
-      );
-      setTokenMetadataLink(metadata);
+      setTokenImageLink(image);
       setTimeout(() => {
-        setTokenMetadata("");
-        setTokenIdForMetadata("");
+        setTokenImageLink("");
       }, 5000);
     } catch (e) {
-      setTokenIdForMetadataNotFound(true);
-      setTokenIdForMetadata("");
+      setTokenIdForImageNotFound(true);
+      setTokenIdForImage("");
     }
   };
 
@@ -86,22 +81,22 @@ const Queries = (props) => {
             <p className="mt-4">{tokenOwner}</p>
           </div>
           <div className="col-md-7">
-            <h5>Get Token Metadata</h5>
-            <form onSubmit={getTokenMetadata}>
+            <h5>Get Token Image</h5>
+            <form onSubmit={getTokenImage}>
               <div className="form-group">
                 <input
                   required
                   type="text"
                   className="form-control"
-                  value={tokenIdForMetadata}
+                  value={tokenIdForImage}
                   placeholder="Enter Token Id"
-                  onChange={(e) => setTokenIdForMetadata(e.target.value)}
+                  onChange={(e) => setTokenIdForImage(e.target.value)}
                 />
               </div>
               <button className="mt-3 btn btn-outline-primary" type="submit">
-                Get Metadata
+                Get Image
               </button>
-              {tokenIdForMetadataNotFound ? (
+              {tokenIdForImageNotFound ? (
                 <div className="alert alert-danger alert-dissmissible mt-4">
                   <button type="button" className="close" data-dismiss="alert">
                     <span>&times;</span>
@@ -112,11 +107,11 @@ const Queries = (props) => {
             </form>
             <p className="mt-4">
               <a
-                href={`${tokenMetadataLink}`}
+                href={`${tokenImageLink}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {tokenMetadata}
+                <img src={tokenImageLink} alt="CryptoPaw Token" />
               </a>
             </p>
           </div>
