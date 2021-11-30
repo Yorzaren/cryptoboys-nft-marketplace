@@ -75,7 +75,7 @@ contract CryptoPaws is ERC721 {
 
     function lottoTransferFrom(uint256 _tokenId, address _lotto, address _winner) external {
         require(_exists(_tokenId), "Token does not exist");
-        require(getTokenOwner(_tokenId) == lotteryfactory, "Token not currently for lottery");
+        require(getTokenOwner(_tokenId) == _lotto, "Token not currently for lottery");
         _transfer(_lotto, _winner, _tokenId);
     }
 
