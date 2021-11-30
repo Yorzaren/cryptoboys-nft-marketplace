@@ -7,6 +7,7 @@ import "./ERC721.sol";
 contract CryptoPaws is ERC721 {
 	address private owner;
     address private lotteryfactory;
+    address private auctionfactory;
 	uint public startTime;
 	
     // name of paw collection for contract
@@ -77,6 +78,14 @@ contract CryptoPaws is ERC721 {
         require(_exists(_tokenId), "Token does not exist");
         require(getTokenOwner(_tokenId) == lotteryfactory, "Token not currently for lottery");
         _transfer(_lotto, _winner, _tokenId);
+    }
+
+    function auctionTransferTo(uint256 _tokenId, address _auction) external {
+
+    }
+
+    function auctionTransferFrom(uint256 _tokenId, address _auction, address winner) external {
+        
     }
 
     // minting function for new PAW
