@@ -21,10 +21,13 @@ class CryptoPawNFTDetails extends Component {
     };
 
     async createAuction() {
-        let Price = window.web3.utils.toWei(this.state.newLotteryPrice, "Ether");
-        let lottoPrice = await this.state.lotteryContract.methods.lottoPrice().call();
+        let Price = await window.web3.utils.toWei(this.state.newLotteryPrice, "Ether");
+        let lottoPrice = await this.state.lotteryContract.methods.lottoPrice.call();
         let token = this.props.cryptoPaw.tokenId.toNumber();
-        this.state.lotteryContract.methods.createLottery(token, Price).send({ from: this.props.accountAddress, value: lottoPrice});
+        console.log(lottoPrice);
+        console.log(Price);
+        console.log(token);
+        await this.state.lotteryContract.methods.createLottery(token, Price).send({ from: this.props.accountAddress, value: lottoPrice});
     }
 
     render() {
