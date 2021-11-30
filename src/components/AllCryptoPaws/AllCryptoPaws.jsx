@@ -9,7 +9,8 @@ const AllCryptoPaws = ({
     totalTokensMinted,
     changeTokenPrice,
     toggleForSale,
-    buyCryptoPaw
+    buyCryptoPaw,
+    lotteryContract
 }) => {
     const [loading, setLoading] = useState(false);
 
@@ -51,6 +52,7 @@ const AllCryptoPaws = ({
                                 changeTokenPrice={changeTokenPrice}
                                 toggleForSale={toggleForSale}
                                 buyCryptoPaw={buyCryptoPaw}
+                                lotteryContract={lotteryContract}
                             />
                         </div>
                     );

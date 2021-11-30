@@ -5,12 +5,30 @@ class CryptoPawNFTDetails extends Component {
         super(props);
         this.state = {
             newCryptoPawPrice: "",
-        };
+            newLotteryPrice: "",
+            lotteryContract: this.props.lotteryContract,
+        }
+        console.log(typeof(this.props.lotteryContract))
+    }
+
+    async componentDidMount() {
+        let x = await this.state.lotteryContract.methods.active(this.props.cryptoPaw.tokenId.toNumber()).call();
+        this.setState({active: x});
     }
 
     callChangeTokenPriceFromApp = (tokenId, newPrice) => {
         this.props.changeTokenPrice(tokenId, newPrice);
     };
+
+    async createAuction() {
+        let Price = await window.web3.utils.toWei(this.state.newLotteryPrice, "Ether");
+        let lottoPrice = await this.state.lotteryContract.methods.lottoPrice.call();
+        let token = this.props.cryptoPaw.tokenId.toNumber();
+        console.log(lottoPrice);
+        console.log(Price);
+        console.log(token);
+        await this.state.lotteryContract.methods.createLottery(token, Price).send({ from: this.props.accountAddress, value: lottoPrice});
+    }
 
     render() {
         return (
@@ -77,7 +95,7 @@ class CryptoPawNFTDetails extends Component {
                 </div>
                 <div>
                     {this.props.accountAddress === this.props.cryptoPaw.currentOwner ? (
-                        this.props.cryptoPaw.forSale ? (
+                        this.props.cryptoPaw.forSale ? 
                             <button
                                 className="btn btn-outline-danger mt-4 w-50"
                                 style={{ fontsize: "0.8rem", letterSpacing: "0.14rem"}}
@@ -89,7 +107,7 @@ class CryptoPawNFTDetails extends Component {
                             >
                                 Remove from sale
                             </button>
-                        ) : (
+                         : 
                             <button
                                 className="btn btn-outline-success mt-4 w-50"
                                 style={{ fontsize: "0.8rem", letterSpacing: "0.14rem"}}
@@ -101,8 +119,49 @@ class CryptoPawNFTDetails extends Component {
                             >
                                 Make For Sale
                             </button>
-                        )
+                        
+                        
                     ) : null}
+                </div>
+                <div>
+                {this.state.x == true ? 
+                        (
+                            null
+                        ):(
+                            <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                this.createAuction()
+                            }}
+                            >
+                            <div className="form-group mt-4">
+                                <label htmlFor="newLotteryPrice">
+                                    <span className="font-weight-bold">Lottery Entry Price</span> :
+                                </label>{" "}
+                                <input
+                                    required
+                                    type="number"
+                                    name="newLotteryPrice"
+                                    id="newLotteryPrice"
+                                    value={this.state.newLotteryPrice}
+                                    className="form-control w-50"
+                                    placeholder="Enter new price"
+                                    onChange={(e) =>
+                                        this.setState({
+                                            newLotteryPrice: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                style={{ fontSize: "0.8rem", letterSpacing: "0.14rem"}}
+                                className="btn btn-outline-info mt-0 w-50"
+                            >
+                                Make Lottery
+                            </button>
+                            </form>
+                        )}
                 </div>
                 <div>
                     {this.props.accountAddress !== this.props.cryptoPaw.currentOwner ? (
@@ -110,7 +169,7 @@ class CryptoPawNFTDetails extends Component {
                             <button
                                 className="btn btn-outline-primary mt-3 w-50"
                                 value={this.props.cryptoPaw.price}
-                                style={{ fonsize: "0.8rem", letterSpacing: "0.14rem"}}
+                                style={{ fontsize: "0.8rem", letterSpacing: "0.14rem"}}
                                 onClick={(e) =>
                                     this.props.buyCryptoPaw(
                                         this.props.cryptoPaw.tokenId.toNumber(),
