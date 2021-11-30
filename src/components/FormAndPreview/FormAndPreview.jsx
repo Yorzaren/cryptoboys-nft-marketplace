@@ -1,9 +1,17 @@
 import React, { Component } from "react";
-import CryptoBoyNFTImage from "../CryptoBoyNFTImage/CryptoBoyNFTImage";
+import CryptoPawNFTImagePreview from "../CryptoPawNFTImagePreview/CryptoPawNFTImagePreview";
+
+const ipfsClient = require("ipfs-http-client");
+const ipfs = ipfsClient({
+  host: "ipfs.infura.io",
+  port: 5001,
+  protocol: "https",
+});
 
 class FormAndPreview extends Component {
   constructor(props) {
     super(props);
+    this.svgelement = React.createRef();
     this.state = {
       userSelectedColors: [
         {
@@ -19,28 +27,46 @@ class FormAndPreview extends Component {
           digitFourBorder: this.getRandomColor(),
           digitcarpalPadColor: this.getRandomColor(),
           digitcarpalPadBorder: this.getRandomColor(),
-          neckBorderColor: this.getRandomColor(),
-          bodyBackgroundColor: this.getRandomColor(),
-          bodyBorderColor: this.getRandomColor(),
         },
       ],
-      cryptoBoyName: "",
-      cryptoBoyPrice: "",
+      cryptoPawName: "",
+      cryptoPawPrice: "",
     };
   }
 
   componentDidMount = async () => {
     await this.props.setMintBtnTimer();
+	await this.props.checkIfPresaleActive();
   };
 
-  callMintMyNFTFromApp = (e) => {
+  callMintMyNFTFromApp = async (e) => {
     e.preventDefault();
+    var s = new XMLSerializer();
+    let svg = s.serializeToString(this.svgelement.current);
+    const cid = await ipfs.add(svg);
+    let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;
     this.props.mintMyNFT(
       this.state.userSelectedColors[0],
-      this.state.cryptoBoyName,
-      this.state.cryptoBoyPrice
+      this.state.cryptoPawName,
+      this.state.cryptoPawPrice,
+      uri
     );
   };
+  // Functionally the same as callMintMyNFTFromApp but requires that the presale time is not up.
+  callPresaleMintFromApp = async (e) => {
+	e.preventDefault();
+    var s = new XMLSerializer();
+    let svg = s.serializeToString(this.svgelement.current);
+    const cid = await ipfs.add(svg);
+    let uri = `https://ipfs.infura.io/ipfs/${cid.path}`;
+	console.log(uri);
+    this.props.presaleMint(
+      this.state.userSelectedColors[0],
+      this.state.cryptoPawName,
+      this.state.cryptoPawPrice,
+      uri
+    );
+  }
   getRandomColor = () => {
 	  return "#"+Math.floor(Math.random()*16777215).toString(16);
   };
@@ -49,33 +75,12 @@ class FormAndPreview extends Component {
       <div>
         <div className="card mt-1">
           <div className="card-body align-items-center d-flex justify-content-center">
-            <h5>Color Your CryptoPaw As You Want It To be!</h5>
+            <h5>Make your own CryptoPaw!</h5>
           </div>
         </div>
         <form onSubmit={this.callMintMyNFTFromApp} className="pt-4 mt-1">
           <div className="row">
             <div className="col-md-3">
-              <div className="form-group">
-                <label htmlFor="cardBorderColor">Card Border Color</label>
-                <input
-                  required
-                  type="color"
-                  name="cardBorderColor"
-                  id="cardBorderColor"
-                  value={this.state.userSelectedColors[0].cardBorderColor}
-                  className="form-control"
-                  onChange={(e) =>
-                    this.setState({
-                      userSelectedColors: [
-                        {
-                          ...this.state.userSelectedColors[0],
-                          cardBorderColor: e.target.value,
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
               <div className="form-group">
                 <label htmlFor="cardBackgroundColor">
                   Card Background Color
@@ -121,31 +126,6 @@ class FormAndPreview extends Component {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="digitOneBorder">
-                  Digit One Border Color
-                </label>
-                <input
-                  required
-                  type="color"
-                  name="digitOneBorder"
-                  id="digitOneBorder"
-                  value={this.state.userSelectedColors[0].digitOneBorder}
-                  className="form-control"
-                  onChange={(e) =>
-                    this.setState({
-                      userSelectedColors: [
-                        {
-                          ...this.state.userSelectedColors[0],
-                          digitOneBorder: e.target.value,
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-            </div>
-            <div className="col-md-3">
-              <div className="form-group">
                 <label htmlFor="digitTwoColor">
                   Digit Two Color
                 </label>
@@ -162,29 +142,6 @@ class FormAndPreview extends Component {
                         {
                           ...this.state.userSelectedColors[0],
                           digitTwoColor: e.target.value,
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="digitTwoBorder">
-                  Digit Two Border Color
-                </label>
-                <input
-                  required
-                  type="color"
-                  name="digitTwoBorder"
-                  id="digitTwoBorder"
-                  value={this.state.userSelectedColors[0].digitTwoBorder}
-                  className="form-control"
-                  onChange={(e) =>
-                    this.setState({
-                      userSelectedColors: [
-                        {
-                          ...this.state.userSelectedColors[0],
-                          digitTwoBorder: e.target.value,
                         },
                       ],
                     })
@@ -210,6 +167,75 @@ class FormAndPreview extends Component {
                         {
                           ...this.state.userSelectedColors[0],
                           digitThreeColor: e.target.value,
+                        },
+                      ],
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="form-group">
+                <label htmlFor="cardBorderColor">Card Border Color</label>
+                <input
+                  required
+                  type="color"
+                  name="cardBorderColor"
+                  id="cardBorderColor"
+                  value={this.state.userSelectedColors[0].cardBorderColor}
+                  className="form-control"
+                  onChange={(e) =>
+                    this.setState({
+                      userSelectedColors: [
+                        {
+                          ...this.state.userSelectedColors[0],
+                          cardBorderColor: e.target.value,
+                        },
+                      ],
+                    })
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="digitOneBorder">
+                  Digit One Border Color
+                </label>
+                <input
+                  required
+                  type="color"
+                  name="digitOneBorder"
+                  id="digitOneBorder"
+                  value={this.state.userSelectedColors[0].digitOneBorder}
+                  className="form-control"
+                  onChange={(e) =>
+                    this.setState({
+                      userSelectedColors: [
+                        {
+                          ...this.state.userSelectedColors[0],
+                          digitOneBorder: e.target.value,
+                        },
+                      ],
+                    })
+                  }
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="digitTwoBorder">
+                  Digit Two Border Color
+                </label>
+                <input
+                  required
+                  type="color"
+                  name="digitTwoBorder"
+                  id="digitTwoBorder"
+                  value={this.state.userSelectedColors[0].digitTwoBorder}
+                  className="form-control"
+                  onChange={(e) =>
+                    this.setState({
+                      userSelectedColors: [
+                        {
+                          ...this.state.userSelectedColors[0],
+                          digitTwoBorder: e.target.value,
                         },
                       ],
                     })
@@ -243,7 +269,7 @@ class FormAndPreview extends Component {
               </div>
             </div>
             <div className="col-md-6 d-flex justify-content-center align-items-center">
-              <CryptoBoyNFTImage colors={this.state.userSelectedColors[0]} />
+              <CryptoPawNFTImagePreview colors={this.state.userSelectedColors[0]} svgref={this.svgelement} />
             </div>
           </div>
           <div className="row">
@@ -274,6 +300,29 @@ class FormAndPreview extends Component {
                 />
               </div>
               <div className="form-group">
+                <label htmlFor="digitcarpalPadColor">Carpal Pad Color</label>
+                <input
+                  required
+                  type="color"
+                  name="digitcarpalPadColor"
+                  id="digitcarpalPadColor"
+                  value={this.state.userSelectedColors[0].digitcarpalPadColor}
+                  className="form-control"
+                  onChange={(e) =>
+                    this.setState({
+                      userSelectedColors: [
+                        {
+                          ...this.state.userSelectedColors[0],
+                          digitcarpalPadColor: e.target.value,
+                        },
+                      ],
+                    })
+                  }
+                />
+              </div>
+            </div>
+            <div className="col-md-3">
+            	<div className="form-group">
                 <label htmlFor="digitFourBorder">
                   Digit Four Border Color
                 </label>
@@ -292,27 +341,6 @@ class FormAndPreview extends Component {
                         {
                           ...this.state.userSelectedColors[0],
                           digitFourBorder: e.target.value,
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="digitcarpalPadColor">Carpal Pad Color</label>
-                <input
-                  required
-                  type="color"
-                  name="digitcarpalPadColor"
-                  id="digitcarpalPadColor"
-                  value={this.state.userSelectedColors[0].digitcarpalPadColor}
-                  className="form-control"
-                  onChange={(e) =>
-                    this.setState({
-                      userSelectedColors: [
-                        {
-                          ...this.state.userSelectedColors[0],
-                          digitcarpalPadColor: e.target.value,
                         },
                       ],
                     })
@@ -343,84 +371,17 @@ class FormAndPreview extends Component {
                 />
               </div>
             </div>
-            <div className="col-md-3">
-              <div className="form-group">
-                <label htmlFor="neckBorderColor">Neck Border Color</label>
-                <input
-                  required
-                  type="color"
-                  name="neckBorderColor"
-                  id="neckBorderColor"
-                  value={this.state.userSelectedColors[0].neckBorderColor}
-                  className="form-control"
-                  onChange={(e) =>
-                    this.setState({
-                      userSelectedColors: [
-                        {
-                          ...this.state.userSelectedColors[0],
-                          neckBorderColor: e.target.value,
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="bodyBackgroundColor">
-                  Body Background Color
-                </label>
-                <input
-                  required
-                  type="color"
-                  name="bodyBackgroundColor"
-                  id="bodyBackgroundColor"
-                  value={this.state.userSelectedColors[0].bodyBackgroundColor}
-                  className="form-control"
-                  onChange={(e) =>
-                    this.setState({
-                      userSelectedColors: [
-                        {
-                          ...this.state.userSelectedColors[0],
-                          bodyBackgroundColor: e.target.value,
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="bodyBorderColor">Body Border Color</label>
-                <input
-                  required
-                  type="color"
-                  name="bodyBorderColor"
-                  id="bodyBorderColor"
-                  value={this.state.userSelectedColors[0].bodyBorderColor}
-                  className="form-control"
-                  onChange={(e) =>
-                    this.setState({
-                      userSelectedColors: [
-                        {
-                          ...this.state.userSelectedColors[0],
-                          bodyBorderColor: e.target.value,
-                        },
-                      ],
-                    })
-                  }
-                />
-              </div>
-            </div>
             <div className="col-md-6">
               <div className="form-group">
-                <label htmlFor="cryptoBoyName">Name</label>
+                <label htmlFor="cryptoPawName">Name</label>
                 <input
                   required
                   type="text"
-                  value={this.state.cryptoBoyName}
+                  value={this.state.cryptoPawName}
                   className="form-control"
                   placeholder="Enter Your CryptoPaw's Name"
                   onChange={(e) =>
-                    this.setState({ cryptoBoyName: e.target.value })
+                    this.setState({ cryptoPawName: e.target.value })
                   }
                 />
               </div>
@@ -430,12 +391,12 @@ class FormAndPreview extends Component {
                   required
                   type="number"
                   name="price"
-                  id="cryptoBoyPrice"
-                  value={this.state.cryptoBoyPrice}
+                  id="cryptoPawPrice"
+                  value={this.state.cryptoPawPrice}
                   className="form-control"
                   placeholder="Enter Price In Ξ"
                   onChange={(e) =>
-                    this.setState({ cryptoBoyPrice: e.target.value })
+                    this.setState({ cryptoPawPrice: e.target.value })
                   }
                 />
               </div>
@@ -446,6 +407,15 @@ class FormAndPreview extends Component {
                 className="btn mt-4 btn-block btn-outline-primary"
               >
                 Mint My CryptoPaw
+              </button>
+			  <button
+                id="presaleMint"
+                style={{ fontSize: "0.9rem", letterSpacing: "0.14rem" }}
+                type="submit"
+                className="btn mt-4 btn-block btn-outline-primary"
+				onClick={this.callPresaleMintFromApp}
+              >
+                PreSale Mint
               </button>
               <div className="mt-4">
                 {this.props.nameIsUsed ? (
