@@ -25,7 +25,7 @@ contract LotteryFactory {
         require(!(active[_id]), "Lottery is already active");
         address owner = cp.getTokenOwner(_id);
         require(msg.sender == owner, "Can't lottery a token you don't own");
-        require(msg.value >= lottoPrice, "You must pay the price to create an auction");
+        require(msg.value >= lottoPrice, "You must pay the price to create a lottery");
         address payable add = payable(msg.sender);
         Lottery lotto = new Lottery(_id, _enterPrice, add);
         cp.lottoTransferTo(_id, address(lotto));

@@ -12,12 +12,14 @@ import CryptoPawNFTLottoDetails from "../CryptoPawNFTLottoDetails/CryptoPawNFTLo
                 accountAddress: this.props.accountAddress,
                 cryptoPawsContract: this.props.cryptoPawsContract,
                 factoryContract: this.props.lotteryContract,
+                LotteriesSize: "",
             }
         }
 
         async componentDidMount() {
             const web3 = window.web3;
             const LotteriesSize = await this.state.factoryContract.methods.totalactive.call();
+            this.setState({ LotteriesSize });
             let lotteryinfo = [];
             
             for (var i = 0; i < LotteriesSize; i++) {
@@ -60,6 +62,15 @@ import CryptoPawNFTLottoDetails from "../CryptoPawNFTLottoDetails/CryptoPawNFTLo
 
         render() {
             return (
+                <div>
+                               <div className="card mt-1">
+                <div className="card-body align-items-center d-flex justify-content-center">
+                    <h5>
+                    Total No. of CryptoPaws Minted On The Platform :{" "}
+                        {this.state.LotteriesSize.toString()}
+                    </h5>
+                </div>
+            </div>
                 <div className="d-flex flex-wrap mb-2">
                     {this.state.lotteryinfo.length == 0 ?
                     <p className="mt-4 mx-auto align-self-center">No lotteries currently active</p>:
@@ -81,6 +92,7 @@ import CryptoPawNFTLottoDetails from "../CryptoPawNFTLottoDetails/CryptoPawNFTLo
                             );
                         })}
                     </div>}
+                </div>
                 </div>
             );
         }
