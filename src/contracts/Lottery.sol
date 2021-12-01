@@ -4,6 +4,8 @@
 pragma solidity  >=0.8.0;
 pragma abicoder v2;
 
+import "./LotteryFactory.sol";
+
 contract Lottery{
     uint256 public tokenId;
     address payable public owner;
@@ -14,6 +16,7 @@ contract Lottery{
     address public winner;
     uint256 public entrantscount;
     bool public finished;
+    address public factory;
 
 
     modifier onlyOwner() {
@@ -22,6 +25,7 @@ contract Lottery{
     }
 
     constructor(uint256 _id, uint256 _price, address payable _owner) {
+        factory = msg.sender;
         tokenId = _id;
         entryPrice = _price;
         owner = _owner;
@@ -44,6 +48,12 @@ contract Lottery{
         uint256 rand = uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, entrants)));
         winner = entrants[rand % entrantscount];
         finished = true;
+        finalize();
+    }
+
+    function finalize() internal {
+        LotteryFactory fact = LotteryFactory(factory);
+        fact.claim(tokenId);
         owner.transfer(address(this).balance);
     }
 }

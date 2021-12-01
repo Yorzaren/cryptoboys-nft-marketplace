@@ -40,7 +40,6 @@ contract LotteryFactory {
         address cont = lotteries[_id];
         Lottery lottoCont = Lottery(cont);
         address Lwinner = lottoCont.winner();
-        require(msg.sender == Lwinner, "You are not the winner");
         cp.lottoTransferFrom(_id, cont, Lwinner);
         for (uint256 i = 0; i < lotteriesarray.length; i++) {
             if (lotteriesarray[i] == _id) {

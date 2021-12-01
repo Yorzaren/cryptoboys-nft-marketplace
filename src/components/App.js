@@ -124,14 +124,17 @@ class App extends Component {
           .pawCounter()
           .call();
         this.setState({ cryptoPawsCount });
+        let pawsx = [];
         for (var i = 1; i <= cryptoPawsCount; i++) {
           const cryptoPaw = await cryptoPawsContract.methods
             .allPaws(i)
             .call();
-          this.setState({
-            cryptoPaws: [...this.state.cryptoPaws, cryptoPaw],
-          });
+          console.log(cryptoPaw)
+          pawsx = [...pawsx, cryptoPaw];
         }
+        this.setState({
+          cryptoPaws: pawsx,
+        });
         let totalTokensMinted = await cryptoPawsContract.methods
           .getTotalNumberMinted()
           .call();
@@ -359,8 +362,7 @@ class App extends Component {
                 render={() => (
                   <AllCryptoPaws
                     accountAddress={this.state.accountAddress}
-                    cryptoPaws={this.state.cryptoPaws}
-                    totalTokensMinted={this.state.totalTokensMinted}
+                    cryptoPawsContract={this.state.cryptoPawsContract}
                     changeTokenPrice={this.changeTokenPrice}
                     toggleForSale={this.toggleForSale}
                     buyCryptoPaw={this.buyCryptoPaw}
@@ -373,10 +375,7 @@ class App extends Component {
                 render={() => (
                   <MyCryptoPaws
                     accountAddress={this.state.accountAddress}
-                    cryptoPaws={this.state.cryptoPaws}
-                    totalTokensOwnedByAccount={
-                      this.state.totalTokensOwnedByAccount
-                    }
+                    cryptoPawsContract={this.state.cryptoPawsContract}
                   />
                 )}
               />

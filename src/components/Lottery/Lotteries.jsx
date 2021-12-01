@@ -1,6 +1,5 @@
 import React, { Component} from "react";
 import Lottery from "../../abis/Lottery.json";
-import Web3 from "web3";
 import CryptoPawNFTImage from "../CryptoPawNFTImage/CryptoPawNFTImage";
 import CryptoPawNFTLottoDetails from "../CryptoPawNFTLottoDetails/CryptoPawNFTLottoDetails";
 
@@ -19,22 +18,23 @@ import CryptoPawNFTLottoDetails from "../CryptoPawNFTLottoDetails/CryptoPawNFTLo
         async componentDidMount() {
             const web3 = window.web3;
             const LotteriesSize = await this.state.factoryContract.methods.totalactive.call();
-            console.log(LotteriesSize)
             let lotteryinfo = [];
-            let x = {
-                id: "",
-                paw: "",
-                address: "",
-                owner: "",
-                active: "",
-                winner: "",
-                contract: ""
-            };
+            
             for (var i = 0; i < LotteriesSize; i++) {
                 
+                let x = {
+                    id: "",
+                    paw: "",
+                    address: "",
+                    owner: "",
+                    active: "",
+                    winner: "",
+                    contract: ""
+                };
                 
                 let id = await this.state.factoryContract.methods.lotteriesarray(i).call();
                 x.id = id;
+                console.log(id)
 
                 x.paw = await this.state.cryptoPawsContract.methods.allPaws(id).call();
 
@@ -50,11 +50,12 @@ import CryptoPawNFTLottoDetails from "../CryptoPawNFTLottoDetails/CryptoPawNFTLo
                 x.finished = await lotteryContract.methods.finished.call();
                 x.winner = await lotteryContract.methods.winner.call();
                 x.contract = lotteryContract;
-
-                lotteryinfo.push(x);
+                
+                if(x.active) {
+                    lotteryinfo = [...lotteryinfo, x];
+                }
             }
             this.setState({ lotteryinfo });
-            console.log(lotteryinfo)
         }
 
         render() {
@@ -66,7 +67,7 @@ import CryptoPawNFTLottoDetails from "../CryptoPawNFTLottoDetails/CryptoPawNFTLo
                         {this.state.lotteryinfo.map((lotteryid) => {
                             return (
                                 <div
-                                    key={lotteryid.id.toNumber()+lotteryid.active+lotteryid.finished}
+                                    key={lotteryid.id.toNumber()}
                                     className="w-100 p-4 mt-1 border"
                                 >
                                     <CryptoPawNFTImage cryptoPaw={lotteryid.paw} />
