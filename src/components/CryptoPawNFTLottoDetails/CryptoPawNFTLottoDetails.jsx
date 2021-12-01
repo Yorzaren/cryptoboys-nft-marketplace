@@ -26,10 +26,6 @@ class CryptoPawNFTLottoDetails extends Component {
         this.props.lotto.contract.methods.endLottery().send({ from: this.props.account });
     }
 
-    claimPaw() {
-        this.props.factory.methods.claim(this.props.lotto.id).send({ from: this.props.account });
-    }
-
     render() {
         return (
             <div key={this.props.lotto.id.toNumber()} className="mt-4">
@@ -45,7 +41,7 @@ class CryptoPawNFTLottoDetails extends Component {
                 </p>
                 <p>
                     <span className="font-weight-bold">Entry Fee</span>: {" "}
-                    {this.state.entryprice}
+                    {window.web3.utils.fromWei(this.state.entryprice, "Ether")}
                 </p>
                 <p>
                     <span className="font-weight-bold">Number of Entrants</span>: {" "}
@@ -59,7 +55,7 @@ class CryptoPawNFTLottoDetails extends Component {
                          onClick={(e) =>
                              this.endlottery()}
                      >
-                         End Auction
+                         End Lottery
                      </button>
                     ): null}
                     {this.props.account !== this.props.lotto.owner && !(this.props.lotto.finished)?
@@ -70,17 +66,8 @@ class CryptoPawNFTLottoDetails extends Component {
                             onClick={(e) =>
                                 this.enterlottery(e.target.value)}
                         >
-                            Enter Auction For {" "}{window.web3.utils.fromWei(this.props.lotto.increment.toString(), "ether")}{" "}Ξ
+                            Enter Lottery For {" "}{window.web3.utils.fromWei(this.props.lotto.increment.toString(), "ether")}{" "}Ξ
                         </button>:null}
-                    {this.props.lotto.winner === this.props.account && this.props.lotto.finished?
-                        <button
-                            className="btn btn-outline-primary mt-3 w-50"
-                            style={{ fontsize: "0.8rem", letterSpacing: "0.14rem"}}
-                            onClick={(e) =>
-                                this.claimPaw()}
-                        >
-                            You won! Click to claim reward
-                        </button>: null}
                 </div>
             </div>
         )

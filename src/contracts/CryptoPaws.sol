@@ -70,13 +70,21 @@ contract CryptoPaws is ERC721 {
         require(_exists(_tokenId), "Token does not exist");
         require(msg.sender == lotteryfactory, "You can't do that");
         address tOwner = getTokenOwner(_tokenId);
-        _transfer(tOwner, _lotto, _tokenId);
+        address payable fromaddress = payable(tOwner);
+        _transfer(fromaddress, _lotto, _tokenId);
+        allPaws[_tokenId].currentOwner = payable(_lotto);
+        //increase transfer counter
+        allPaws[_tokenId].timesTransferred++;
     }
 
     function lottoTransferFrom(uint256 _tokenId, address _lotto, address _winner) external {
         require(_exists(_tokenId), "Token does not exist");
         require(getTokenOwner(_tokenId) == _lotto, "Token not currently for lottery");
-        _transfer(_lotto, _winner, _tokenId);
+        address payable fromaddress = payable(_lotto);
+        _transfer(fromaddress, _winner, _tokenId);
+        allPaws[_tokenId].currentOwner = payable(_winner);
+        //increase transfer counter
+        allPaws[_tokenId].timesTransferred++;
     }
 
     // minting function for new PAW

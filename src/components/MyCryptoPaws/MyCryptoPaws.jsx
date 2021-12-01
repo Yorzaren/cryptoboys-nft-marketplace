@@ -1,41 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { Component } from "react";
 import CryptoPawNFTImage from "../CryptoPawNFTImage/CryptoPawNFTImage";
 import MyCryptoPawNFTDetails from "../MyCryptoPawNFTDetails/MyCryptoPawNFTDetails";
-import Loading from "../Loading/Loading";
 
-const MyCryptoPaws = ({
-    accountAddress,
-    cryptoPaws,
-    totalTokensOwnedByAccount
-}) => {
-    const [loading, setLoading] = useState(false);
-    const [myCryptoPaws, setMyCryptoPaws] = useState([]);
+class MyCryptoPaws extends Component {
+    
+    constructor(props) {
+        super(props);
+        this.state = {
+            mypaws: [],
+            account: this.props.accountAddress,
+            pawContract: this.props.cryptoPawsContract
+        }
+    }
 
-    useEffect(() => {
-        if(cryptoPaws.length !== 0) {
-            if (cryptoPaws[0].tokenURI !== undefined) {
-                setLoading(loading);
-            } else {
-                setLoading(false);
+    async componentDidMount() {
+        let totalpaws = await this.state.pawContract.methods.pawCounter().call();
+        let mypaws = [];
+        for (var i = 1; i <= totalpaws; i++) {
+            let x = await this.state.pawContract.methods.allPaws(i).call();
+            if(x.currentOwner === this.state.account) {
+               mypaws = [...mypaws, x]; 
             }
         }
-        const my_crypto_paws = cryptoPaws.filter(
-            (cryptopaw) => cryptopaw.currentOwner === accountAddress
-        );
-        setMyCryptoPaws(my_crypto_paws);
-    }, [cryptoPaws]);
+        this.setState( { mypaws });
+    }
 
-    return (
-        <div>
+    render() {
+        return (
+            <div>
             <div className="card mt-1">
                 <div className="card-body align-items-center d-flex justify-content-center">
                     <h5>
-                        Total No. of CryptoPaws You Own: {totalTokensOwnedByAccount}
+                        Total No. of CryptoPaws You Own: {this.state.mypaws.length}
                     </h5>
                 </div>
             </div>
             <div className="d-flex flex-wrap mb-2">
-                {myCryptoPaws.map((cryptopaw) => {
+                {this.state.mypaws.map((cryptopaw) => {
                     return (
                         <div
                             key={cryptopaw.tokenId.toNumber()}
@@ -43,16 +44,14 @@ const MyCryptoPaws = ({
                         >
                             <div className="row">
                                 <div className="col-md-6">
-                                    {!loading ? (
+
                                         <CryptoPawNFTImage cryptoPaw={cryptopaw}/>
-                                    ) : (
-                                        <Loading />
-                                    )}
+            
                                 </div>
                                 <div className="col-md-6 text-center">
                                     <MyCryptoPawNFTDetails
                                     cryptoPaw={cryptopaw}
-                                    accountAddress={accountAddress}
+                                    accountAddress={this.state.account}
                                 />
                                 </div>
                             </div>
@@ -61,7 +60,8 @@ const MyCryptoPaws = ({
                 })}
             </div>
         </div>
-    );
-};
+        );
+    }
+}
 
 export default MyCryptoPaws;

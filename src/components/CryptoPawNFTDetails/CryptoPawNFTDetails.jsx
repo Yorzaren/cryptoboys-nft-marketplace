@@ -8,7 +8,6 @@ class CryptoPawNFTDetails extends Component {
             newLotteryPrice: "",
             lotteryContract: this.props.lotteryContract,
         }
-        console.log(typeof(this.props.lotteryContract))
     }
 
     async componentDidMount() {
@@ -22,11 +21,9 @@ class CryptoPawNFTDetails extends Component {
 
     async createAuction() {
         let Price = await window.web3.utils.toWei(this.state.newLotteryPrice, "Ether");
+        console.log(Price);
         let lottoPrice = await this.state.lotteryContract.methods.lottoPrice.call();
         let token = this.props.cryptoPaw.tokenId.toNumber();
-        console.log(lottoPrice);
-        console.log(Price);
-        console.log(token);
         await this.state.lotteryContract.methods.createLottery(token, Price).send({ from: this.props.accountAddress, value: lottoPrice});
     }
 
@@ -124,14 +121,15 @@ class CryptoPawNFTDetails extends Component {
                     ) : null}
                 </div>
                 <div>
-                {this.state.x == true ? 
+                {this.props.accountAddress != this.props.cryptoPaw.currentOwner ? 
                         (
                             null
                         ):(
                             <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                this.createAuction()
+                                this.createAuction();
+                                
                             }}
                             >
                             <div className="form-group mt-4">
