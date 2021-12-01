@@ -7,6 +7,7 @@ class CryptoPawNFTDetails extends Component {
             newCryptoPawPrice: "",
             newLotteryPrice: "",
             lotteryContract: this.props.lotteryContract,
+            auctionContract: this.props.auctionContract
         }
     }
 
@@ -19,12 +20,18 @@ class CryptoPawNFTDetails extends Component {
         this.props.changeTokenPrice(tokenId, newPrice);
     };
 
-    async createAuction() {
+    async createLottery() {
         let Price = await window.web3.utils.toWei(this.state.newLotteryPrice, "Ether");
         console.log(Price);
         let lottoPrice = await this.state.lotteryContract.methods.lottoPrice.call();
         let token = this.props.cryptoPaw.tokenId.toNumber();
         await this.state.lotteryContract.methods.createLottery(token, Price).send({ from: this.props.accountAddress, value: lottoPrice});
+    }
+
+    async createAuction() {
+        let auctionprice = await this.state.auctionContract.methods.auctionPrice.call();
+        let token = this.props.cryptoPaw.tokenId.toNumber();
+        await this.state.auctionContract.methods.createAuction(token).send({from: this.props.accountAddress, value:auctionprice})
     }
 
     render() {
@@ -128,7 +135,7 @@ class CryptoPawNFTDetails extends Component {
                             <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                this.createAuction();
+                                this.createLottery();
                                 
                             }}
                             >
@@ -196,6 +203,17 @@ class CryptoPawNFTDetails extends Component {
                             </>
                         )
                     ) : null}
+                </div>
+                <div>
+                    {this.props.accountAddress === this.props.cryptoPaw.currentOwner?
+                        <button
+                            className="btn btn-outline-primary mt-3 w-50"
+                            style={{ fontsize: "0.8rem", letterSpacing: "0.14rem"}}
+                            onClick={this.createAuction.bind(this)}
+                        >
+                                Create Auction
+                                </button>
+                    :null}
                 </div>
             </div>
         )

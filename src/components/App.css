@@ -5,3 +5,8 @@ input::-webkit-input-placeholder {
 input[type="color"]:hover {
   cursor: pointer;
 }
+
+html {
+  margin-left: 4rem;
+  margin-right: 4rem;
+}

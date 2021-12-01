@@ -61,6 +61,7 @@ class AllCryptoPaws extends Component {
                                     toggleForSale={this.props.toggleForSale}
                                     buyCryptoPaw={this.props.buyCryptoPaw}
                                     lotteryContract={this.props.lotteryContract}
+                                    auctionContract={this.props.auctionContract}
                                     />
                         </div>
                     );

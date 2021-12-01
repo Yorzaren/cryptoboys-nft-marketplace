@@ -32,15 +32,21 @@ contract AuctionFactory {
         cp.auctionTransferTo(_id, address(auct));
         owners[_id] = msg.sender;
         auctions[_id] = address(auct);
+        active[_id] = true;
         auctionarray.push(_id);
         totalactive = totalactive + 1;
     }
 
     function claim(uint256 _id, address _winner) public {
         address cont = auctions[_id];
-        Auction auctCont = Auction(cont);
         cp.auctionTransferFrom(_id, cont, _winner);
         active[_id] = false;
         totalactive = totalactive - 1;
+        for (uint256 i = 0; i < auctionarray.length; i++) {
+            if (auctionarray[i] == _id) {
+                auctionarray[i] == auctionarray[auctionarray.length-1];
+                auctionarray.pop();
+            }
+        }
     }
 }

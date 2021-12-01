@@ -8,7 +8,7 @@ import "./AuctionFactory.sol";
 contract Auction{
     uint256 public tokenId;
     address payable public owner;
-    mapping(address => uint256) bids;
+    mapping(address => uint256) public bids;
     address public highestbidder;
     uint256 public highestbid;
     uint256 public highestbinding;
@@ -57,9 +57,11 @@ contract Auction{
 
         for (uint256 i = 0; i < bidders.length; i++) {
             if (bidders[i] == highestbidder) {
-                bidders[i].transfer(highestbid - highestbinding);
+                address payable w = payable(bidders[i]);
+                w.transfer(highestbid - highestbinding);
             } else {
-                bidders[i].transfer(bids[bidders[i]]);
+                address payable w = payable(bidders[i]);
+                w.transfer(highestbid - highestbinding);
             }
         }
     }

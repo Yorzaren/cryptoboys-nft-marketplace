@@ -4,6 +4,7 @@ import "./App.css";
 import Web3 from "web3";
 import CryptoPaws from "../abis/CryptoPaws.json";
 import LotteryFactory from "../abis/LotteryFactory.json";
+import AuctionFactory from "../abis/AuctionFactory.json";
 
 import FormAndPreview from "../components/FormAndPreview/FormAndPreview";
 import AllCryptoPaws from "./AllCryptoPaws/AllCryptoPaws";
@@ -15,6 +16,7 @@ import Navbar from "./Navbar/Navbar";
 import MyCryptoPaws from "./MyCryptoPaws/MyCryptoPaws";
 import Queries from "./Queries/Queries";
 import Lotteries from "./Lottery/Lotteries";
+import Auctions from "./Auctions/Auctions";
 
 class App extends Component {
   constructor(props) {
@@ -24,6 +26,7 @@ class App extends Component {
       accountBalance: "",
       FactoryContract: null,
       cryptoPawsContract: null,
+      auctionContract: null,
       cryptoPawsCount: 0,
       cryptoPaws: [],
       loading: true,
@@ -107,7 +110,8 @@ class App extends Component {
       const networkId = await web3.eth.net.getId();
       const networkData = CryptoPaws.networks[networkId];
       const factoryNetworkData = LotteryFactory.networks[networkId];
-      if (networkData && factoryNetworkData) {
+      const auctfactoryData = AuctionFactory.networks[networkId];
+      if (networkData && factoryNetworkData && auctfactoryData) {
         this.setState({ loading: true });
         const cryptoPawsContract = web3.eth.Contract(
           CryptoPaws.abi,
@@ -117,6 +121,11 @@ class App extends Component {
           LotteryFactory.abi,
           factoryNetworkData.address
         );
+        const auctionContract = web3.eth.Contract(
+          AuctionFactory.abi,
+          auctfactoryData.address
+        );
+        this.setState({ auctionContract });
         this.setState({ FactoryContract });
         this.setState({ cryptoPawsContract });
         this.setState({ contractDetected: true });
@@ -322,7 +331,7 @@ class App extends Component {
 
   render() {
     return (
-      <div className="container">
+      <div className="ml-25 mr-25">
         {!this.state.metamaskConnected ? (
           <ConnectToMetamask connectToMetamask={this.connectToMetamask} />
         ) : !this.state.contractDetected ? (
@@ -367,6 +376,7 @@ class App extends Component {
                     toggleForSale={this.toggleForSale}
                     buyCryptoPaw={this.buyCryptoPaw}
                     lotteryContract={this.state.FactoryContract}
+                    auctionContract={this.state.auctionContract}
                   />
                 )}
               />
@@ -377,6 +387,15 @@ class App extends Component {
                     accountAddress={this.state.accountAddress}
                     cryptoPawsContract={this.state.cryptoPawsContract}
                   />
+                )}
+              />
+              <Route
+                path="/auctions"
+                render={() => (
+                  <Auctions
+                  cryptoPawsContract={this.state.cryptoPawsContract}
+                  accountAddress={this.state.accountAddress}
+                  auctionContract={this.state.auctionContract}/>
                 )}
               />
               <Route
