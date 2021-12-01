@@ -7,6 +7,7 @@ import "./ERC721.sol";
 contract CryptoPaws is ERC721 {
 	address private owner;
     address private lotteryfactory;
+    address private auctionfactory;
 	uint public startTime;
 	
     // name of paw collection for contract
@@ -62,8 +63,12 @@ contract CryptoPaws is ERC721 {
         _;
     }
 
-    function setFactoryAddress(address _lottofactoryaddress) external onlyOwner{
+    function setLottFactoryAddress(address _lottofactoryaddress) external onlyOwner{
         lotteryfactory = _lottofactoryaddress;
+    }
+
+    function setAucFactoryAddress(address _auctionfactoryaddress) external onlyOwner{
+        auctionfactory = _auctionfactoryaddress;
     }
 
     function lottoTransferTo(uint256 _tokenId, address _lotto) external {
@@ -77,10 +82,33 @@ contract CryptoPaws is ERC721 {
         allPaws[_tokenId].timesTransferred++;
     }
 
+    function auctionTransferTo(uint256 _tokenId, address _auction) external {
+        require(_exists(_tokenId), "Token does not exist");
+        require(msg.sender == auctionfactory, "You can't do that");
+        address tOwner = getTokenOwner(_tokenId);
+        address payable fromaddress = payable(tOwner);
+        _transfer(fromaddress, _auction, _tokenId);
+        allPaws[_tokenId].currentOwner = payable(_auction);
+        //increase transfer counter
+        allPaws[_tokenId].timesTransferred++;
+    }
+
     function lottoTransferFrom(uint256 _tokenId, address _lotto, address _winner) external {
         require(_exists(_tokenId), "Token does not exist");
+        require(msg.sender == lotteryfactory, "You can't do that");
         require(getTokenOwner(_tokenId) == _lotto, "Token not currently for lottery");
         address payable fromaddress = payable(_lotto);
+        _transfer(fromaddress, _winner, _tokenId);
+        allPaws[_tokenId].currentOwner = payable(_winner);
+        //increase transfer counter
+        allPaws[_tokenId].timesTransferred++;
+    }
+
+    function auctionTransferFrom(uint256 _tokenId, address _auction, address _winner) external {
+        require(_exists(_tokenId), "Token does not exist");
+        require(msg.sender == auctionfactory, "You can't do that");
+        require(getTokenOwner(_tokenId) == _auction, "Token not currently for lottery");
+        address payable fromaddress = payable(_auction);
         _transfer(fromaddress, _winner, _tokenId);
         allPaws[_tokenId].currentOwner = payable(_winner);
         //increase transfer counter
