@@ -1,25 +1,13 @@
-const CryptoPaws = artifacts.require("./CryptoPaws.sol");
-var PawAuctionFactory = artifacts.require("./PawAuctionFactory.sol");
-var PawAuction = artifacts.require("./PawAuction.sol");
+const CryptoPaws = artifacts.require("CryptoPaws");
+const lottery = artifacts.require("Lottery.sol");
+const lotteryfactory = artifacts.require("LotteryFactory.sol");
+const auction = artifacts.require("PawAuction.sol");
+const auctionfactory = artifacts.require("PawAuctionFactory.sol");
 
 module.exports = async function(deployer) {
-  await deployer.deploy(CryptoPaws);
-  await deployer.deploy(PawAuctionFactory);
-  await deployer.deploy(PawAuction);
-
+  let pawContract = await deployer.deploy(CryptoPaws);
+  let lotterycontract = await deployer.deploy(lottery);
+  let factore = await deployer.deploy(lotteryfactory, CryptoPaws.address, lottery.address);
+  let auctioncontract = await deployer.deploy(auction);
+  let factory = await deployer.deploy(auctionfactory, CryptoPaws.address, auction.address);
 };
-
-
-
-// Possible additions necessary for the auction contract
-
-// var AuctionFactory = artifacts.require("./PawAuctionFactory.sol");
-// var Auction = artifacts.require("./PawAuction.sol");
-
-//module.exports = function(deployer) {
-  // deployer.deploy(ConvertLib);
-  // deployer.autolink();
-  // deployer.deploy(MetaCoin);
-  //deployer.deploy(AuctionFactory);
-  // deployer.deploy(Auction);
-//};

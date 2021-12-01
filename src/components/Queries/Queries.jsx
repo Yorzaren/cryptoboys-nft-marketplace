@@ -111,7 +111,7 @@ const Queries = (props) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img src={tokenImageLink} alt="CryptoPaw Image" />
+                <img src={tokenImageLink} alt="CryptoPaw Token" />
               </a>
             </p>
           </div>
